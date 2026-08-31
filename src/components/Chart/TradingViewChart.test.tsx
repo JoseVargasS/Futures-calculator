@@ -5,8 +5,7 @@ import { TradingViewChart } from "./TradingViewChart";
 describe("TradingViewChart", () => {
   it("crea widget MEXC con símbolo sin _ y opts de dibujo", () => {
     render(<TradingViewChart symbol="SUI_USDT" exchange="MEXC" />);
-    // @ts-expect-error mock
-    const opts = window.__mockTradingViewLastOpts() as Record<string, unknown>;
+    const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
     expect(opts.symbol).toBe("MEXC:SUIUSDT");
     expect(opts.hide_side_toolbar).toBe(false);
     expect(opts.allow_symbol_change).toBe(true);
@@ -15,8 +14,7 @@ describe("TradingViewChart", () => {
 
   it("BINANCE prefix", () => {
     render(<TradingViewChart symbol="BTCUSDT" exchange="BINANCE" />);
-    // @ts-expect-error mock
-    const opts = window.__mockTradingViewLastOpts() as Record<string, unknown>;
+    const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
     expect(opts.symbol).toBe("BINANCE:BTCUSDT");
   });
 
@@ -28,8 +26,8 @@ describe("TradingViewChart", () => {
 
   it("no crea widget si TradingView no está", () => {
     const prev = window.TradingView;
-    // @ts-expect-error delete mock
-    delete window.TradingView;
+    // @ts-ignore delete mock
+    delete (window as unknown as { TradingView?: unknown }).TradingView;
     const { container } = render(<div id="tradingview_container" />);
     // el componente busca por id global, no usa container, así que solo verifica early return
     expect(() => render(<TradingViewChart symbol="BTCUSDT" exchange="BINANCE" />)).not.toThrow();
