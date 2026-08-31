@@ -6,17 +6,17 @@
   <title>Crypto Futures Dashboard Pro (Responsive)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script src="mexc_list.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
             binanceBg: '#0b0e11',
             binanceCard: '#1e2329',
@@ -32,49 +32,39 @@
       }
     }
   </script>
-  <style>
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0b0e11;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2b313a;
-      border-radius: 3px;
-    }
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none;
-      margin: 0; 
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
-  </style>
 </head>
 <body class="bg-binanceBg text-gray-200 font-sans min-h-screen pb-10 antialiased selection:bg-accentYellow selection:text-black">
 
   <!-- NAVIGATION HEADER -->
-  <header class="sticky top-0 z-50 bg-binanceCard/90 border-b border-binanceBorder px-4 py-3 shadow-md backdrop-blur-md">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
+  <header class="sticky top-0 z-50 bg-binanceCard/90 border-b border-binanceBorder px-2 lg:px-3 py-3 shadow-md backdrop-blur-md">
+    <div class="w-full flex justify-between items-center">
       <div class="flex items-center space-x-3">
         <div class="flex items-center space-x-2">
           <div class="w-3 h-3 rounded-full bg-accentYellow animate-pulse"></div>
           <h1 class="font-black text-lg tracking-wide text-white">FUTURES PRO</h1>
         </div>
-        <span class="text-[10px] font-extrabold bg-binanceInput text-accentYellow px-2 py-0.5 rounded border border-gray-700 hidden sm:inline-block">RESPONSIVE DASHBOARD</span>
+
       </div>
 
-      <!-- ASSET SELECTOR & LIVE PRICE BAR — buscador -->
-      <div class="flex items-center space-x-3">
+      <!-- CONTROLS: EXCHANGE / MARKET / ASSET BUSCADOR -->
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        <!-- Exchange toggle -->
+        <div class="flex items-center bg-binanceBg p-0.5 rounded-lg border border-binanceBorder">
+          <button id="btnMexc" onclick="setExchange('MEXC')" class="px-2.5 py-1 text-[11px] font-black rounded-md bg-accentYellow text-black shadow">MEXC</button>
+          <button id="btnBinance" onclick="setExchange('BINANCE')" class="px-2.5 py-1 text-[11px] font-black rounded-md text-gray-400 hover:text-white">BINANCE</button>
+        </div>
+        <!-- Market toggle -->
+        <div class="flex items-center bg-binanceBg p-0.5 rounded-lg border border-binanceBorder">
+          <button id="btnFutures" onclick="setMarket('FUTURES')" class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-binanceInput text-accentYellow border border-gray-700">FUTURES</button>
+          <button id="btnSpot" onclick="setMarket('SPOT')" class="px-2.5 py-1 text-[11px] font-bold rounded-md text-gray-400 hover:text-white">SPOT</button>
+        </div>
+        <!-- Asset buscador -->
         <div class="relative" id="assetPickerWrap">
           <div class="relative">
             <svg class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             <input id="assetSearch" type="text" autocomplete="off" placeholder="Buscar par (BTCUSDT)" value="BTCUSDT"
-              class="bg-binanceInput text-white font-bold text-sm rounded-lg pl-8 pr-7 py-1.5 outline-none border border-binanceBorder focus:border-accentYellow w-[170px] sm:w-[220px] placeholder:text-gray-500 placeholder:font-medium uppercase"
-              oninput="onAssetSearchInput()" onfocus="openAssetDropdown()" onkeydown="onAssetSearchKeydown(event)">
+              class="bg-binanceInput text-white font-bold text-sm rounded-lg pl-8 pr-7 py-1.5 outline-none border border-binanceBorder focus:border-accentYellow w-[155px] sm:w-[200px] placeholder:text-gray-500 placeholder:font-medium uppercase"
+              oninput="onAssetSearchInput()" onfocus="onAssetSearchFocus(this)" onblur="onAssetSearchBlur(this)" onkeydown="onAssetSearchKeydown(event)">
             <span id="assetCount" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500"></span>
           </div>
           <div id="assetDropdown" class="hidden absolute right-0 mt-1.5 w-full bg-binanceCard border border-binanceBorder rounded-lg shadow-2xl z-50 max-h-[320px] overflow-y-auto">
@@ -87,16 +77,16 @@
   </header>
 
   <!-- MAIN CONTENT CONTAINER (GRID ON PC, STACK ON MOBILE) -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-4">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+  <main class="w-full px-1 sm:px-2 lg:px-3 pt-3">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-3 items-stretch">
 
       <!-- LEFT COLUMN: CALCULATOR & METRICS (4 COLS ON PC) -->
-      <div class="lg:col-span-5 xl:col-span-4 space-y-4">
+      <div class="lg:col-span-4 xl:col-span-3 space-y-4">
 
         <!-- TICKER MINI CARD -->
         <section class="bg-binanceCard rounded-xl p-4 border border-binanceBorder shadow-lg flex justify-between items-center">
           <div>
-            <span class="text-[11px] text-gray-400 font-medium block uppercase tracking-wider">Precio Live Binance</span>
+            <span id="livePriceLabel" class="text-[11px] text-gray-400 font-medium block uppercase tracking-wider">Precio Live MEXC — FUTURES</span>
             <div class="flex items-baseline space-x-2 mt-0.5">
               <span id="livePrice" class="text-2xl font-black text-accentYellow tracking-tight">$--.--</span>
               <span id="priceChange" class="text-xs font-semibold text-gray-400">0.00%</span>
@@ -238,12 +228,12 @@
       </div>
 
       <!-- RIGHT COLUMN: EXPANDED TRADINGVIEW CHART (7-8 COLS ON PC) -->
-      <div class="lg:col-span-7 xl:col-span-8 space-y-4">
-        <section class="bg-binanceCard rounded-xl p-3 sm:p-4 border border-binanceBorder shadow-xl space-y-3">
+      <div class="lg:col-span-8 xl:col-span-9 space-y-4 flex flex-col">
+        <section class="bg-binanceCard rounded-xl p-3 sm:p-4 border border-binanceBorder shadow-xl space-y-3 flex-1 flex flex-col">
           <div class="flex justify-between items-center px-1">
             <div class="flex items-center space-x-2">
               <svg class="w-4 h-4 text-accentYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z"></path></svg>
-              <h2 class="text-xs font-bold text-gray-300 tracking-wide uppercase">Gráfico Técnico Interactivo (PC / Tablet / Móvil)</h2>
+              <h2 class="text-xs font-bold text-gray-300 tracking-wide uppercase">Gráfico Técnico Interactivo</h2>
             </div>
             <div class="flex space-x-2">
               <span class="text-[10px] font-bold bg-binanceInput text-gray-400 px-2 py-0.5 rounded border border-gray-700">SMA 50,75,100,150,200</span>
@@ -251,382 +241,13 @@
             </div>
           </div>
           <!-- Chart container height adjusts dynamically for PC vs Mobile -->
-          <div id="tradingview_container" class="h-[480px] lg:h-[620px] w-full rounded-lg overflow-hidden border border-binanceBorder bg-binanceBg"></div>
+          <div id="tradingview_container" class="h-[600px] lg:h-[820px] xl:h-[88vh] min-h-[600px] w-full rounded-lg overflow-hidden border border-binanceBorder bg-binanceBg flex-1"></div>
         </section>
       </div>
 
     </div>
   </main>
 
-  <!-- LOGIC SCRIPT -->
-  <script>
-    let currentDirection = 'LONG';
-    let currentLivePrice = 0;
-    let tpSlMode = 'PRICE'; // 'PRICE' or 'PCT'
-    let ws = null;
-    let allSymbols = [];
-    let filteredSymbols = [];
-    let dropdownOpen = false;
-    let highlightedIndex = -1;
-
-    // — formato precio: >=1 => 2 decimales, <1 => mínimo 4 decimales y 4 dígitos significativos
-    function decimalsForPrice(p) {
-      if (!isFinite(p) || p <= 0) return 4;
-      if (p >= 1) return 2;
-      const exp = Math.floor(Math.log10(p)); // negativo
-      return Math.min(Math.max(-exp + 3, 4), 20);
-    }
-    function fmtPrice(p) { // "$0.8500" / "$65,000.00"
-      if (!isFinite(p) || p === 0) return "$0.00";
-      if (p >= 1) return "$" + p.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-      const d = decimalsForPrice(p);
-      return "$" + p.toFixed(d);
-    }
-    function fmtPriceInput(p) { // sin "$", para inputs type=number
-      if (!isFinite(p) || p === 0) return "0.0000";
-      if (p >= 1) return p.toFixed(2);
-      return p.toFixed(decimalsForPrice(p));
-    }
-
-    // Populate Leverage Options (1x to 50x)
-    const levSelect = document.getElementById('leverageSelect');
-    for (let i = 1; i <= 50; i++) {
-      let opt = document.createElement('option');
-      opt.value = i;
-      opt.innerText = i + 'x';
-      if (i === 20) opt.selected = true;
-      levSelect.appendChild(opt);
-    }
-
-    function setTpSlMode(mode) {
-      tpSlMode = mode;
-      const modePriceBtn = document.getElementById('modePriceBtn');
-      const modePctBtn = document.getElementById('modePctBtn');
-      const priceContainer = document.getElementById('priceInputsContainer');
-      const pctContainer = document.getElementById('pctInputsContainer');
-
-      if (mode === 'PRICE') {
-        modePriceBtn.className = "px-2 py-0.5 text-[10px] font-bold rounded text-accentYellow bg-binanceInput border border-gray-700";
-        modePctBtn.className = "px-2 py-0.5 text-[10px] font-bold rounded text-gray-400 hover:text-white";
-        priceContainer.classList.remove('hidden');
-        pctContainer.classList.add('hidden');
-      } else {
-        modePctBtn.className = "px-2 py-0.5 text-[10px] font-bold rounded text-accentYellow bg-binanceInput border border-gray-700";
-        modePriceBtn.className = "px-2 py-0.5 text-[10px] font-bold rounded text-gray-400 hover:text-white";
-        pctContainer.classList.remove('hidden');
-        priceContainer.classList.add('hidden');
-      }
-      calculate();
-    }
-
-    function setDirection(dir) {
-      currentDirection = dir;
-      const bLong = document.getElementById('btnLong');
-      const bShort = document.getElementById('btnShort');
-
-      if (dir === 'LONG') {
-        bLong.className = "py-2.5 rounded-md font-bold text-sm transition-all duration-200 bg-accentGreen text-gray-950 shadow-md flex justify-center items-center space-x-1";
-        bShort.className = "py-2.5 rounded-md font-bold text-sm transition-all duration-200 text-gray-400 hover:text-white flex justify-center items-center space-x-1";
-      } else {
-        bShort.className = "py-2.5 rounded-md font-bold text-sm transition-all duration-200 bg-accentRed text-white shadow-md flex justify-center items-center space-x-1";
-        bLong.className = "py-2.5 rounded-md font-bold text-sm transition-all duration-200 text-gray-400 hover:text-white flex justify-center items-center space-x-1";
-      }
-      calculate();
-    }
-
-    function connectBinanceWS(symbol) {
-      if (ws) ws.close();
-      const streamName = symbol.toLowerCase() + '@ticker';
-      ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streamName}`);
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        currentLivePrice = parseFloat(data.c);
-        const priceChangePercent = parseFloat(data.P);
-
-        const livePriceEl = document.getElementById('livePrice');
-        const priceChangeEl = document.getElementById('priceChange');
-
-        livePriceEl.innerText = fmtPrice(currentLivePrice);
-
-        if (priceChangePercent >= 0) {
-          priceChangeEl.innerText = `+${priceChangePercent.toFixed(2)}%`;
-          priceChangeEl.className = "text-xs font-semibold text-accentGreen";
-        } else {
-          priceChangeEl.innerText = `${priceChangePercent.toFixed(2)}%`;
-          priceChangeEl.className = "text-xs font-semibold text-accentRed";
-        }
-      };
-    }
-
-    function useLiveAsEntry() {
-      if (currentLivePrice > 0) {
-        document.getElementById('entryInput').value = fmtPriceInput(currentLivePrice);
-        
-        // Auto estimate default TP/SL if in price mode
-        if (currentDirection === 'LONG') {
-          document.getElementById('tpInput').value = fmtPriceInput(currentLivePrice * 1.03);
-          document.getElementById('slInput').value = fmtPriceInput(currentLivePrice * 0.985);
-        } else {
-          document.getElementById('tpInput').value = fmtPriceInput(currentLivePrice * 0.97);
-          document.getElementById('slInput').value = fmtPriceInput(currentLivePrice * 1.015);
-        }
-        calculate();
-      }
-    }
-
-    function loadTradingViewChart(symbol) {
-      document.getElementById('tradingview_container').innerHTML = '';
-      new TradingView.widget({
-        "autosize": true,
-        "symbol": "BINANCE:" + symbol,
-        "interval": "15",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "es",
-        "toolbar_bg": "#1e2329",
-        "enable_publishing": false,
-        "allow_symbol_change": false,
-        "container_id": "tradingview_container",
-        "studies": [
-          "STD;SMA",
-          "STD;RSI"
-        ]
-      });
-    }
-
-    // — buscador de pares (misma API Binance) —
-    async function fetchSymbols() {
-      const fallback = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT'];
-      try {
-        const res = await fetch('https://api.binance.com/api/v3/exchangeInfo');
-        if (!res.ok) throw new Error('exchangeInfo ' + res.status);
-        const data = await res.json();
-        const syms = (data.symbols || [])
-          .filter(s => s.status === 'TRADING' && s.quoteAsset === 'USDT' && s.isSpotTradingAllowed)
-          .map(s => s.symbol)
-          .sort();
-        allSymbols = syms.length ? syms : fallback;
-      } catch(e) {
-        // fallback: intenta con ticker/price si exchangeInfo falla (rate limit)
-        try {
-          const r2 = await fetch('https://api.binance.com/api/v3/ticker/price');
-          const d2 = await r2.json();
-          const syms2 = d2.map(x=>x.symbol).filter(s=>s.endsWith('USDT')).sort();
-          allSymbols = syms2.length ? syms2 : fallback;
-        } catch(_) { allSymbols = fallback; }
-      }
-      document.getElementById('assetCount').innerText = allSymbols.length + ' pares';
-      renderDropdown(document.getElementById('assetSearch').value.trim().toUpperCase());
-    }
-
-    function renderDropdown(filter) {
-      const listEl = document.getElementById('assetDropdownList');
-      const emptyEl = document.getElementById('assetDropdownEmpty');
-      const q = (filter || '').toUpperCase();
-      filteredSymbols = q ? allSymbols.filter(s => s.includes(q)) : allSymbols.slice(0, 80);
-      // limita a 80 para no reventar el DOM
-      const toShow = filteredSymbols.slice(0, 80);
-      listEl.innerHTML = '';
-      highlightedIndex = -1;
-      if (!toShow.length) { emptyEl.classList.remove('hidden'); return; }
-      emptyEl.classList.add('hidden');
-      const cur = getCurrentSymbol();
-      toShow.forEach(sym => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        const isCur = sym === cur;
-        btn.className = 'w-full text-left px-3 py-1.5 text-xs font-bold flex justify-between items-center hover:bg-binanceInput transition ' + (isCur ? 'bg-binanceInput text-accentYellow' : 'text-gray-300');
-        btn.innerHTML = `<span>${sym.replace('USDT',' / USDT')}</span><span class="text-[10px] ${isCur ? 'text-accentYellow' : 'text-gray-500'}">${isCur ? '● actual' : ''}</span>`;
-        btn.onclick = () => selectSymbol(sym);
-        listEl.appendChild(btn);
-      });
-      if (filteredSymbols.length > 80) {
-        const more = document.createElement('div');
-        more.className = 'px-3 py-1.5 text-[10px] text-gray-500 text-center border-t border-binanceBorder';
-        more.innerText = `+${filteredSymbols.length - 80} más — sigue escribiendo para filtrar`;
-        listEl.appendChild(more);
-      }
-    }
-
-    function getCurrentSymbol() {
-      const el = document.getElementById('assetSearch');
-      return (el.value || '').trim().toUpperCase().replace(/\s|\//g,'');
-    }
-
-    function selectSymbol(sym) {
-      document.getElementById('assetSearch').value = sym;
-      closeAssetDropdown();
-      onAssetChange();
-    }
-
-    function openAssetDropdown() {
-      const dd = document.getElementById('assetDropdown');
-      dd.classList.remove('hidden');
-      dropdownOpen = true;
-      renderDropdown(getCurrentSymbol());
-    }
-    function closeAssetDropdown() {
-      document.getElementById('assetDropdown').classList.add('hidden');
-      dropdownOpen = false;
-      highlightedIndex = -1;
-    }
-    function onAssetSearchInput() {
-      const el = document.getElementById('assetSearch');
-      el.value = el.value.toUpperCase();
-      openAssetDropdown();
-      renderDropdown(el.value.trim());
-    }
-    function onAssetSearchKeydown(e) {
-      const items = document.getElementById('assetDropdownList').querySelectorAll('button');
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (!dropdownOpen) openAssetDropdown();
-        highlightedIndex = Math.min(highlightedIndex + 1, items.length -1);
-        highlightItem(items);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        highlightedIndex = Math.max(highlightedIndex -1, 0);
-        highlightItem(items);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (highlightedIndex >= 0 && items[highlightedIndex]) items[highlightedIndex].click();
-        else {
-          // si escribe un símbolo exacto y da enter
-          const sym = getCurrentSymbol();
-          if (allSymbols.includes(sym)) selectSymbol(sym);
-          else if (filteredSymbols[0]) selectSymbol(filteredSymbols[0]);
-        }
-      } else if (e.key === 'Escape') closeAssetDropdown();
-    }
-    function highlightItem(items) {
-      items.forEach((b,i)=>{
-        b.classList.toggle('!bg-binanceInput', i===highlightedIndex);
-        b.classList.toggle('!text-accentYellow', i===highlightedIndex);
-      });
-      if (items[highlightedIndex]) items[highlightedIndex].scrollIntoView({block:'nearest'});
-    }
-    // cierra al click fuera
-    document.addEventListener('click', (e)=>{
-      const wrap = document.getElementById('assetPickerWrap');
-      if (wrap && !wrap.contains(e.target)) closeAssetDropdown();
-    });
-
-    function onAssetChange() {
-      const raw = getCurrentSymbol();
-      const symbol = allSymbols.includes(raw) ? raw : (raw || 'BTCUSDT');
-      // normaliza el input si era válido
-      if (allSymbols.includes(raw)) document.getElementById('assetSearch').value = symbol;
-      connectBinanceWS(symbol);
-      loadTradingViewChart(symbol);
-    }
-
-    function onInputChange(changedSource) {
-      calculate(changedSource);
-    }
-
-    function calculate(source) {
-      const margin = parseFloat(document.getElementById('marginInput').value) || 0;
-      const leverage = parseInt(document.getElementById('leverageSelect').value) || 1;
-      const entry = parseFloat(document.getElementById('entryInput').value) || 0;
-
-      const posValue = margin * leverage;
-      document.getElementById('posValue').innerText = `$${posValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-
-      if (entry <= 0) return;
-
-      const tokens = posValue / entry;
-      document.getElementById('tokenSizeDisplay').innerText = `${tokens.toFixed(4)} Contratos`;
-
-      // Estimated Liquidation Price
-      let liq = 0;
-      if (currentDirection === 'LONG') {
-        liq = entry * (1 - (1 / leverage));
-      } else {
-        liq = entry * (1 + (1 / leverage));
-      }
-      document.getElementById('liqPrice').innerText = fmtPrice(liq);
-
-      let tpPrice = 0;
-      let slPrice = 0;
-      let tpRoe = 0;
-      let slRoe = 0;
-
-      if (tpSlMode === 'PRICE') {
-        tpPrice = parseFloat(document.getElementById('tpInput').value) || 0;
-        slPrice = parseFloat(document.getElementById('slInput').value) || 0;
-
-        let tpDiff = currentDirection === 'LONG' ? (tpPrice - entry) : (entry - tpPrice);
-        let slDiff = currentDirection === 'LONG' ? (entry - slPrice) : (slPrice - entry);
-
-        let tpProfit = tokens * tpDiff;
-        let slLoss = tokens * slDiff;
-
-        tpRoe = margin > 0 ? (tpProfit / margin) * 100 : 0;
-        slRoe = margin > 0 ? (slLoss / margin) * 100 : 0;
-
-        // Sync ROE % inputs
-        document.getElementById('tpPctInput').value = tpRoe.toFixed(2);
-        document.getElementById('slPctInput').value = slRoe.toFixed(2);
-
-      } else {
-        // ROE % Mode
-        tpRoe = parseFloat(document.getElementById('tpPctInput').value) || 0;
-        slRoe = parseFloat(document.getElementById('slPctInput').value) || 0;
-
-        // Calculate Target Prices from ROE %
-        let tpPriceMovePct = tpRoe / leverage;
-        let slPriceMovePct = slRoe / leverage;
-
-        if (currentDirection === 'LONG') {
-          tpPrice = entry * (1 + (tpPriceMovePct / 100));
-          slPrice = entry * (1 - (slPriceMovePct / 100));
-        } else {
-          tpPrice = entry * (1 - (tpPriceMovePct / 100));
-          slPrice = entry * (1 + (slPriceMovePct / 100));
-        }
-
-        // Sync Price inputs
-        document.getElementById('tpInput').value = fmtPriceInput(tpPrice);
-        document.getElementById('slInput').value = fmtPriceInput(slPrice);
-      }
-
-      // Calculate Net Profits/Losses
-      let tpProfitUSD = (tpRoe / 100) * margin;
-      let slLossUSD = (slRoe / 100) * margin;
-
-      // Update TP Card Display
-      document.getElementById('tpProfit').innerText = `${tpProfitUSD >= 0 ? '+' : ''}$${tpProfitUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById('tpRoeDisplay').innerText = `${tpRoe >= 0 ? '+' : ''}${tpRoe.toFixed(2)}% ROE`;
-      document.getElementById('tpDistDisplay').innerText = `Precio TP: ${fmtPrice(tpPrice)}`;
-
-      // Update SL Card Display
-      document.getElementById('slLoss').innerText = `-$${Math.abs(slLossUSD).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById('slRoeDisplay').innerText = `-${Math.abs(slRoe).toFixed(2)}% ROE`;
-      document.getElementById('slDistDisplay').innerText = `Precio SL: ${fmtPrice(slPrice)}`;
-
-      // Risk / Reward Ratio & Badge
-      let rr = Math.abs(slLossUSD) > 0 ? (tpProfitUSD / Math.abs(slLossUSD)) : 0;
-      document.getElementById('rrRatio').innerText = `${rr > 0 ? rr.toFixed(2) : '0.00'} : 1`;
-
-      const badge = document.getElementById('rrBadge');
-      if (rr >= 2.0) {
-        badge.innerText = "EXCELENTE";
-        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-accentGreen/20 text-accentGreen border border-accentGreen/30";
-      } else if (rr >= 1.5) {
-        badge.innerText = "ACEPTABLE";
-        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-accentYellow/20 text-accentYellow border border-accentYellow/30";
-      } else {
-        badge.innerText = "DESFAVORABLE";
-        badge.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-accentRed/20 text-accentRed border border-accentRed/30";
-      }
-    }
-
-    window.onload = () => {
-      fetchSymbols().then(()=> onAssetChange());
-      calculate();
-    };
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
