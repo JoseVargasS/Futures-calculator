@@ -11,7 +11,7 @@ describe("AssetPicker", () => {
     const onSelect = vi.fn();
     render(<AssetPicker symbols={SYMBOLS} value="BTC_USDT" market="FUTURES" onSelect={onSelect} />);
     expect(screen.getByText("5 pares")).toBeInTheDocument();
-    const input = screen.getByPlaceholderText("BTCUSDT") as HTMLInputElement;
+    const input = screen.getByPlaceholderText(/BTCUSDT/) as HTMLInputElement;
     // focus limpia (vacía) y muestra lista completa
     await user.click(input);
     expect(input.value).toBe("");
@@ -31,7 +31,7 @@ describe("AssetPicker", () => {
     rerender(<AssetPicker symbols={["BTCUSDT"]} value="BTCUSDT" market="SPOT" onSelect={vi.fn()} />);
     // SPOT display con slash en dropdown
     const user = userEvent.setup();
-    await user.click(screen.getByPlaceholderText("BTCUSDT"));
+    await user.click(screen.getByPlaceholderText(/BTCUSDT/));
     // para SPOT el dropdown muestra "BTC / USDT"
     expect(screen.getByText("BTC / USDT")).toBeInTheDocument();
   });
@@ -40,8 +40,8 @@ describe("AssetPicker", () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(<AssetPicker symbols={SYMBOLS} value="BTC_USDT" market="FUTURES" onSelect={onSelect} />);
-    await user.click(screen.getByPlaceholderText("BTCUSDT"));
-    await user.type(screen.getByPlaceholderText("Buscar SUI, BTC...") || screen.getByPlaceholderText("BTCUSDT"), "p");
+    await user.click(screen.getByPlaceholderText(/BTCUSDT/));
+    await user.type(screen.getByPlaceholderText("Buscar SUI, BTC...") || screen.getByPlaceholderText(/BTCUSDT/), "p");
     await user.keyboard("{ArrowDown}{Enter}");
     expect(onSelect).toHaveBeenCalled();
   });

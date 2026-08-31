@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDeferredValue, useCallback, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { TickerCard } from "@/components/TickerCard";
 import { Calculator } from "@/components/Calculator/Calculator";
@@ -6,20 +6,23 @@ import { TradingViewChart } from "@/components/Chart/TradingViewChart";
 import { useSymbols, type Exchange, type Market } from "@/hooks/useSymbols";
 import { useLivePrice } from "@/hooks/useLivePrice";
 import { normalizeSym, displayInputSym } from "@/lib/symbols";
+import { useI18n } from "@/i18n/context";
 
 export default function App() {
+  const { t, lang } = useI18n();
+  const deferredLang = useDeferredValue(lang);
   const [exchange, setExchange] = useState<Exchange>("MEXC");
   const [market, setMarket] = useState<Market>("FUTURES");
   const [symbol, setSymbol] = useState("BTCUSDT");
 
   const { symbols } = useSymbols(exchange, market);
 
-  // canonical para WS y TradingView (MEXC conserva _ )
-  const canonicalSymbol = (() => {
+  // canonical para WS y TradingView (MEXC conserva _ ) — memoizado
+  const canonicalSymbol = useMemo(() => {
     const norm = normalizeSym(symbol);
     const found = symbols.find((s) => normalizeSym(s) === norm);
     return found ?? symbol;
-  })();
+  }, [symbol, symbols]);
 
   const { price, changePct } = useLivePrice(canonicalSymbol, exchange, market);
 
@@ -33,22 +36,25 @@ export default function App() {
     }
   }, [symbols]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSymbolChange = (raw: string) => {
-    // raw is canonical like BTC_USDT or BTCUSDT, we store display form
-    const found = symbols.find((s) => normalizeSym(s) === normalizeSym(raw));
-    setSymbol(found ? displayInputSym(found) : raw);
-  };
+  const handleSymbolChange = useCallback(
+    (raw: string) => {
+      const found = symbols.find((s) => normalizeSym(s) === normalizeSym(raw));
+      setSymbol(found ? displayInputSym(found) : raw);
+    },
+    [symbols],
+  );
 
-  const handleExchange = (e: Exchange) => {
+  const handleExchange = useCallback((e: Exchange) => {
     setExchange(e);
-  };
+  }, []);
 
-  const handleMarket = (m: Market) => {
+  const handleMarket = useCallback((m: Market) => {
     setMarket(m);
-  };
+  }, []);
 
-  // tvSymbol ya es canonical
+  // tvSymbol ya es canonical — locale diferido para no bloquear UI
   const tvSymbol = canonicalSymbol;
+  const chartLocale = deferredLang;
 
   return (
     <div className="min-h-screen bg-binanceBg pb-10">
@@ -74,14 +80,14 @@ export default function App() {
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                   <svg className="h-4 w-4 text-accentYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z" /></svg>
-                  <h2 className="text-xs font-bold uppercase tracking-wide text-gray-300">Gráfico Técnico Interactivo</h2>
+                  <h2 className="text-xs font-bold uppercase tracking-wide text-gray-300">{t.chart.title}</h2>
                 </div>
                 <div className="flex gap-2">
-                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">SMA 50,75,100,150,200</span>
-                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">RSI & VOL</span>
+                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.sma}</span>
+                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.rsiVol}</span>
                 </div>
               </div>
-              <TradingViewChart symbol={tvSymbol} exchange={exchange} />
+              <TradingViewChart symbol={tvSymbol} exchange={exchange} locale={chartLocale} />
             </section>
           </div>
         </div>

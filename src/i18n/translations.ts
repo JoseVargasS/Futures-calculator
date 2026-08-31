@@ -1,0 +1,106 @@
+export type Lang = "es" | "en";
+
+export const translations = {
+  es: {
+    header: {
+      futuresPro: "FUTURES PRO",
+    },
+    ticker: {
+      live: "Precio Live",
+      setEntry: "Fijar Entrada",
+    },
+    calculator: {
+      title: "Calculadora de Operación",
+      modeDollar: "Modo $",
+      modeRoe: "Modo ROE %",
+      margin: "Margen / Capital ($)",
+      leverage: "Apalancamiento",
+      entryPrice: "Precio de Entrada ($)",
+      contracts: "Contratos",
+      takeProfit: "Take Profit ($)",
+      stopLoss: "Stop Loss ($)",
+      targetRoe: "Target ROE (% Ganancia)",
+      limitRoe: "Límite ROE (% Pérdida)",
+      positionValue: "Valor Posición",
+      liquidationPrice: "P. Liquidación Est.",
+      tpTargetProfit: "Ganancia TP Target",
+      slLimitRisk: "Riesgo SL Limit",
+      tpPrice: "Precio TP",
+      slPrice: "Precio SL",
+      riskReward: "Ratio Riesgo / Beneficio:",
+      long: "LONG",
+      short: "SHORT",
+      badgeExcellent: "EXCELENTE",
+      badgeAcceptable: "ACEPTABLE",
+      badgeUnfavorable: "DESFAVORABLE",
+    },
+    chart: {
+      title: "Gráfico Técnico Interactivo",
+      sma: "SMA 50,75,100,150,200",
+      rsiVol: "RSI & VOL",
+    },
+    assetPicker: {
+      placeholder: "Buscar par (BTCUSDT)",
+      placeholderSearching: "Buscar SUI, BTC...",
+      noResults: "Sin resultados",
+      pairs: "pares",
+      more: "más — sigue escribiendo para filtrar",
+      current: "● actual",
+    },
+    search: {
+      placeholder: "Buscar par (BTCUSDT)",
+    },
+  },
+  en: {
+    header: {
+      futuresPro: "FUTURES PRO",
+    },
+    ticker: {
+      live: "Live Price",
+      setEntry: "Set Entry",
+    },
+    calculator: {
+      title: "Trading Calculator",
+      modeDollar: "Mode $",
+      modeRoe: "ROE % Mode",
+      margin: "Margin / Capital ($)",
+      leverage: "Leverage",
+      entryPrice: "Entry Price ($)",
+      contracts: "Contracts",
+      takeProfit: "Take Profit ($)",
+      stopLoss: "Stop Loss ($)",
+      targetRoe: "Target ROE (% Profit)",
+      limitRoe: "Limit ROE (% Loss)",
+      positionValue: "Position Value",
+      liquidationPrice: "Est. Liquidation Price",
+      tpTargetProfit: "TP Target Profit",
+      slLimitRisk: "SL Limit Risk",
+      tpPrice: "TP Price",
+      slPrice: "SL Price",
+      riskReward: "Risk / Reward Ratio:",
+      long: "LONG",
+      short: "SHORT",
+      badgeExcellent: "EXCELLENT",
+      badgeAcceptable: "ACCEPTABLE",
+      badgeUnfavorable: "UNFAVORABLE",
+    },
+    chart: {
+      title: "Interactive Technical Chart",
+      sma: "SMA 50,75,100,150,200",
+      rsiVol: "RSI & VOL",
+    },
+    assetPicker: {
+      placeholder: "Search pair (BTCUSDT)",
+      placeholderSearching: "Search SUI, BTC...",
+      noResults: "No results",
+      pairs: "pairs",
+      more: "more — keep typing to filter",
+      current: "● current",
+    },
+    search: {
+      placeholder: "Search pair (BTCUSDT)",
+    },
+  },
+} as const;
+
+export type TranslationKeys = typeof translations.es;

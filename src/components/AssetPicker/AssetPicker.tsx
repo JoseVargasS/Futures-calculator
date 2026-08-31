@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { normalizeSym, displaySym, displayInputSym } from "@/lib/symbols";
+import { useI18n } from "@/i18n/context";
 
 type Props = {
   symbols: string[];
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function AssetPicker({ symbols, value, market, onSelect }: Props) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
@@ -77,7 +79,7 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
         <input
           ref={inputRef}
           value={open ? query : displayValue}
-          placeholder={open ? "Buscar SUI, BTC..." : "BTCUSDT"}
+          placeholder={open ? t.assetPicker.placeholderSearching : t.assetPicker.placeholder}
           onChange={(e) => {
             setQuery(e.target.value.toUpperCase());
             setOpen(true);
@@ -86,13 +88,13 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
           onKeyDown={handleKeyDown}
           className="w-[155px] rounded-lg border border-binanceBorder bg-binanceInput py-1.5 pl-8 pr-7 text-sm font-bold uppercase text-white placeholder:font-medium placeholder:text-gray-500 focus:border-accentYellow focus:outline-none sm:w-[200px]"
         />
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500">{symbols.length} pares</span>
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500">{symbols.length} {t.assetPicker.pairs}</span>
       </div>
 
       {open && (
         <div className="absolute right-0 z-50 mt-1.5 max-h-[320px] w-full overflow-y-auto rounded-lg border border-binanceBorder bg-binanceCard shadow-2xl">
           {filtered.length === 0 ? (
-            <div className="px-3 py-4 text-center text-xs text-gray-500">Sin resultados</div>
+            <div className="px-3 py-4 text-center text-xs text-gray-500">{t.assetPicker.noResults}</div>
           ) : (
             filtered.map((sym, idx) => {
               const isCur = normalizeSym(sym) === normalizedValue;
@@ -104,13 +106,13 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
                   className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-xs font-bold transition hover:bg-binanceInput ${highlight === idx ? "!bg-binanceInput !text-accentYellow" : isCur ? "bg-binanceInput text-accentYellow" : "text-gray-300"}`}
                 >
                   <span>{displaySym(sym, market)}</span>
-                  <span className={`text-[10px] ${isCur ? "text-accentYellow" : "text-gray-500"}`}>{isCur ? "● actual" : ""}</span>
+                  <span className={`text-[10px] ${isCur ? "text-accentYellow" : "text-gray-500"}`}>{isCur ? t.assetPicker.current : ""}</span>
                 </button>
               );
             })
           )}
           {hasMore > 0 && (
-            <div className="border-t border-binanceBorder px-3 py-1.5 text-center text-[10px] text-gray-500">+{hasMore} más — sigue escribiendo para filtrar</div>
+            <div className="border-t border-binanceBorder px-3 py-1.5 text-center text-[10px] text-gray-500">+{hasMore} {t.assetPicker.more}</div>
           )}
         </div>
       )}

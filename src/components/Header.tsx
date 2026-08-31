@@ -1,5 +1,7 @@
+import { memo } from "react";
 import type { Exchange, Market } from "@/hooks/useSymbols";
 import { AssetPicker } from "./AssetPicker/AssetPicker";
+import { useI18n } from "@/i18n/context";
 
 type Props = {
   exchange: Exchange;
@@ -11,7 +13,8 @@ type Props = {
   onSymbolChange: (s: string) => void;
 };
 
-export function Header({ exchange, market, symbols, currentSymbol, onExchangeChange, onMarketChange, onSymbolChange }: Props) {
+export const Header = memo(function Header({ exchange, market, symbols, currentSymbol, onExchangeChange, onMarketChange, onSymbolChange }: Props) {
+  const { lang, setLang, isPending } = useI18n() as ReturnType<typeof useI18n> & { isPending?: boolean };
   return (
     <header className="sticky top-0 z-50 border-b border-binanceBorder bg-binanceCard/90 px-2 py-3 shadow-md backdrop-blur-md lg:px-3">
       <div className="flex w-full items-center justify-between">
@@ -53,9 +56,28 @@ export function Header({ exchange, market, symbols, currentSymbol, onExchangeCha
             </button>
           </div>
 
+          <div className="flex items-center rounded-lg border border-binanceBorder bg-binanceBg p-0.5" aria-label="Language">
+            <button
+              onClick={() => setLang("es")}
+              aria-pressed={lang === "es"}
+              disabled={!!isPending}
+              className={`rounded-md px-2 py-1 text-[11px] font-bold transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "es" ? "bg-binanceInput text-white shadow" : "text-gray-400 hover:text-white"}`}
+            >
+              ES
+            </button>
+            <button
+              onClick={() => setLang("en")}
+              aria-pressed={lang === "en"}
+              disabled={!!isPending}
+              className={`rounded-md px-2 py-1 text-[11px] font-bold transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "en" ? "bg-binanceInput text-white shadow" : "text-gray-400 hover:text-white"}`}
+            >
+              EN
+            </button>
+          </div>
+
           <AssetPicker symbols={symbols} value={currentSymbol} market={market} onSelect={onSymbolChange} />
         </div>
       </div>
     </header>
   );
-}
+});

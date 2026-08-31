@@ -1,21 +1,26 @@
 import { describe, it, expect } from "vitest";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { TradingViewChart } from "./TradingViewChart";
 
 describe("TradingViewChart", () => {
-  it("crea widget MEXC con símbolo sin _ y opts de dibujo", () => {
+  it("crea widget MEXC con símbolo sin _ y opts de dibujo", async () => {
     render(<TradingViewChart symbol="SUI_USDT" exchange="MEXC" />);
+    await waitFor(() => {
+      const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
+      expect(opts.symbol).toBe("MEXC:SUIUSDT");
+    });
     const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
-    expect(opts.symbol).toBe("MEXC:SUIUSDT");
     expect(opts.hide_side_toolbar).toBe(false);
     expect(opts.allow_symbol_change).toBe(true);
     expect(opts.interval).toBe("15");
   });
 
-  it("BINANCE prefix", () => {
+  it("BINANCE prefix", async () => {
     render(<TradingViewChart symbol="BTCUSDT" exchange="BINANCE" />);
-    const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
-    expect(opts.symbol).toBe("BINANCE:BTCUSDT");
+    await waitFor(() => {
+      const opts = (window as unknown as { __mockTradingViewLastOpts: () => Record<string, unknown> }).__mockTradingViewLastOpts() as Record<string, unknown>;
+      expect(opts.symbol).toBe("BINANCE:BTCUSDT");
+    });
   });
 
   it("no crea widget si container no existe", () => {
