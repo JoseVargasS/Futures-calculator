@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Futures Dashboard Pro (Responsive)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script src="mexc_list.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            binanceBg: '#0b0e11',
+            binanceCard: '#1e2329',
+            binanceInput: '#2b313a',
+            binanceBorder: '#2b313a',
+            accentGreen: '#0ecb81',
+            accentRed: '#f6465d',
+            accentYellow: '#f0b90b',
+            accentGreenBg: 'rgba(14, 203, 129, 0.1)',
+            accentRedBg: 'rgba(246, 70, 93, 0.1)'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-binanceBg text-gray-200 font-sans min-h-screen pb-10 antialiased selection:bg-accentYellow selection:text-black">
+
+  <!-- NAVIGATION HEADER -->
+  <header class="sticky top-0 z-50 bg-binanceCard/90 border-b border-binanceBorder px-2 lg:px-3 py-3 shadow-md backdrop-blur-md">
+    <div class="w-full flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-3 h-3 rounded-full bg-accentYellow animate-pulse"></div>
+          <h1 class="font-black text-lg tracking-wide text-white">FUTURES PRO</h1>
+        </div>
+
+      </div>
+
+      <!-- CONTROLS: EXCHANGE / MARKET / ASSET BUSCADOR -->
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        <!-- Exchange toggle -->
+        <div class="flex items-center bg-binanceBg p-0.5 rounded-lg border border-binanceBorder">
+          <button id="btnMexc" onclick="setExchange('MEXC')" class="px-2.5 py-1 text-[11px] font-black rounded-md bg-accentYellow text-black shadow">MEXC</button>
+          <button id="btnBinance" onclick="setExchange('BINANCE')" class="px-2.5 py-1 text-[11px] font-black rounded-md text-gray-400 hover:text-white">BINANCE</button>
+        </div>
+        <!-- Market toggle -->
+        <div class="flex items-center bg-binanceBg p-0.5 rounded-lg border border-binanceBorder">
+          <button id="btnFutures" onclick="setMarket('FUTURES')" class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-binanceInput text-accentYellow border border-gray-700">FUTURES</button>
+          <button id="btnSpot" onclick="setMarket('SPOT')" class="px-2.5 py-1 text-[11px] font-bold rounded-md text-gray-400 hover:text-white">SPOT</button>
+        </div>
+        <!-- Asset buscador -->
+        <div class="relative" id="assetPickerWrap">
+          <div class="relative">
+            <svg class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input id="assetSearch" type="text" autocomplete="off" placeholder="Buscar par (BTCUSDT)" value="BTCUSDT"
+              class="bg-binanceInput text-white font-bold text-sm rounded-lg pl-8 pr-7 py-1.5 outline-none border border-binanceBorder focus:border-accentYellow w-[155px] sm:w-[200px] placeholder:text-gray-500 placeholder:font-medium uppercase"
+              oninput="onAssetSearchInput()" onfocus="onAssetSearchFocus(this)" onblur="onAssetSearchBlur(this)" onkeydown="onAssetSearchKeydown(event)">
+            <span id="assetCount" class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500"></span>
+          </div>
+          <div id="assetDropdown" class="hidden absolute right-0 mt-1.5 w-full bg-binanceCard border border-binanceBorder rounded-lg shadow-2xl z-50 max-h-[320px] overflow-y-auto">
+            <div id="assetDropdownList"></div>
+            <div id="assetDropdownEmpty" class="hidden px-3 py-4 text-center text-xs text-gray-500">Sin resultados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER (GRID ON PC, STACK ON MOBILE) -->
+  <main class="w-full px-1 sm:px-2 lg:px-3 pt-3">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-3 items-stretch">
+
+      <!-- LEFT COLUMN: CALCULATOR & METRICS (4 COLS ON PC) -->
+      <div class="lg:col-span-4 xl:col-span-3 space-y-4">
+
+        <!-- TICKER MINI CARD -->
+        <section class="bg-binanceCard rounded-xl p-4 border border-binanceBorder shadow-lg flex justify-between items-center">
+          <div>
+            <span id="livePriceLabel" class="text-[11px] text-gray-400 font-medium block uppercase tracking-wider">Precio Live MEXC — FUTURES</span>
+            <div class="flex items-baseline space-x-2 mt-0.5">
+              <span id="livePrice" class="text-2xl font-black text-accentYellow tracking-tight">$--.--</span>
+              <span id="priceChange" class="text-xs font-semibold text-gray-400">0.00%</span>
+            </div>
+          </div>
+          <button onclick="useLiveAsEntry()" class="bg-gray-800 hover:bg-gray-700 active:scale-95 text-xs text-accentYellow font-semibold px-3 py-2 rounded-lg border border-gray-700 transition flex items-center space-x-1 shadow">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <span>Fijar Entrada</span>
+          </button>
+        </section>
+
+        <!-- CALCULATOR MAIN CARD -->
+        <section class="bg-binanceCard rounded-xl p-4 border border-binanceBorder shadow-xl space-y-4">
+          <div class="flex justify-between items-center border-b border-binanceBorder pb-2">
+            <h2 class="text-xs font-bold text-gray-300 tracking-wider uppercase">Calculadora de Operación</h2>
+            <!-- TP/SL MODE TOGGLE -->
+            <div class="flex items-center bg-binanceBg p-0.5 rounded-lg border border-binanceBorder">
+              <button id="modePriceBtn" onclick="setTpSlMode('PRICE')" class="px-2 py-0.5 text-[10px] font-bold rounded text-accentYellow bg-binanceInput border border-gray-700">Modo $</button>
+              <button id="modePctBtn" onclick="setTpSlMode('PCT')" class="px-2 py-0.5 text-[10px] font-bold rounded text-gray-400 hover:text-white">Modo ROE %</button>
+            </div>
+          </div>
+
+          <!-- DIRECTION SWITCH (LONG / SHORT) -->
+          <div class="grid grid-cols-2 gap-2 bg-binanceBg p-1 rounded-lg border border-binanceBorder">
+            <button id="btnLong" onclick="setDirection('LONG')" class="py-2.5 rounded-md font-bold text-sm transition-all duration-200 bg-accentGreen text-gray-950 shadow-md flex justify-center items-center space-x-1">
+              <span>LONG</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+            </button>
+            <button id="btnShort" onclick="setDirection('SHORT')" class="py-2.5 rounded-md font-bold text-sm transition-all duration-200 text-gray-400 hover:text-white flex justify-center items-center space-x-1">
+              <span>SHORT</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path></svg>
+            </button>
+          </div>
+
+          <!-- INPUT GRID: MARGIN & LEVERAGE -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-semibold text-gray-400 block mb-1">Margen / Capital ($)</label>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-gray-500 font-bold text-sm">$</span>
+                <input type="number" id="marginInput" value="100" min="1" step="any" oninput="onInputChange('margin')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg pl-7 pr-2 py-2 text-white font-bold text-sm outline-none focus:border-accentYellow transition">
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-gray-400 block mb-1">Apalancamiento</label>
+              <select id="leverageSelect" onchange="onInputChange('leverage')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg px-3 py-2 text-white font-bold text-sm outline-none focus:border-accentYellow transition cursor-pointer">
+              </select>
+            </div>
+          </div>
+
+          <!-- INPUT ENTRY PRICE -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-semibold text-gray-400">Precio de Entrada ($)</label>
+              <span id="tokenSizeDisplay" class="text-[10px] text-gray-500 font-mono">0.0000 Contratos</span>
+            </div>
+            <input type="number" id="entryInput" value="65000" step="any" oninput="onInputChange('entry')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg px-3 py-2 text-white font-bold text-sm outline-none focus:border-accentYellow transition">
+          </div>
+
+          <!-- DYNAMIC TP / SL INPUT CONTROLS -->
+          <div id="priceInputsContainer" class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-semibold text-accentGreen block mb-1">Take Profit ($)</label>
+              <input type="number" id="tpInput" value="68000" step="any" oninput="onInputChange('tpPrice')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg px-3 py-2 text-accentGreen font-bold text-sm outline-none focus:border-accentGreen transition">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-accentRed block mb-1">Stop Loss ($)</label>
+              <input type="number" id="slInput" value="63500" step="any" oninput="onInputChange('slPrice')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg px-3 py-2 text-accentRed font-bold text-sm outline-none focus:border-accentRed transition">
+            </div>
+          </div>
+
+          <div id="pctInputsContainer" class="grid grid-cols-2 gap-3 hidden">
+            <div>
+              <label class="text-[11px] font-semibold text-accentGreen block mb-1">Target ROE (% Ganancia)</label>
+              <div class="relative">
+                <input type="number" id="tpPctInput" value="92.31" step="any" oninput="onInputChange('tpPct')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg pl-3 pr-6 py-2 text-accentGreen font-bold text-sm outline-none focus:border-accentGreen transition">
+                <span class="absolute right-2.5 top-2 text-accentGreen font-bold text-xs">%</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-accentRed block mb-1">Límite ROE (% Pérdida)</label>
+              <div class="relative">
+                <input type="number" id="slPctInput" value="46.15" step="any" oninput="onInputChange('slPct')" class="w-full bg-binanceInput border border-binanceBorder rounded-lg pl-3 pr-6 py-2 text-accentRed font-bold text-sm outline-none focus:border-accentRed transition">
+                <span class="absolute right-2.5 top-2 text-accentRed font-bold text-xs">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESULTS SUMMARY PANEL -->
+          <div class="bg-binanceBg rounded-xl p-3.5 border border-binanceBorder space-y-3">
+            
+            <div class="grid grid-cols-2 gap-2 text-xs border-b border-binanceBorder pb-2.5">
+              <div>
+                <span class="text-gray-500 block text-[10px] uppercase font-bold">Valor Posición</span>
+                <span id="posValue" class="text-white font-extrabold text-sm">$0.00</span>
+              </div>
+              <div>
+                <span class="text-gray-500 block text-[10px] uppercase font-bold">P. Liquidación Est.</span>
+                <span id="liqPrice" class="text-accentYellow font-extrabold text-sm">$0.00</span>
+              </div>
+            </div>
+
+            <!-- TAKE PROFIT CARD -->
+            <div class="bg-accentGreenBg p-2.5 rounded-lg border border-accentGreen/20 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-accentGreen font-bold block uppercase tracking-wider">Ganancia TP Target</span>
+                <span id="tpProfit" class="text-accentGreen font-black text-base">+$0.00</span>
+              </div>
+              <div class="text-right">
+                <span id="tpRoeDisplay" class="text-accentGreen font-extrabold text-xs block">+0.00% ROE</span>
+                <span id="tpDistDisplay" class="text-gray-400 text-[10px] block">Precio TP: $0.00</span>
+              </div>
+            </div>
+
+            <!-- STOP LOSS CARD -->
+            <div class="bg-accentRedBg p-2.5 rounded-lg border border-accentRed/20 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-accentRed font-bold block uppercase tracking-wider">Riesgo SL Limit</span>
+                <span id="slLoss" class="text-accentRed font-black text-base">-$0.00</span>
+              </div>
+              <div class="text-right">
+                <span id="slRoeDisplay" class="text-accentRed font-extrabold text-xs block">-0.00% ROE</span>
+                <span id="slDistDisplay" class="text-gray-400 text-[10px] block">Precio SL: $0.00</span>
+              </div>
+            </div>
+
+            <!-- RISK REWARD RATIO BADGE -->
+            <div class="flex justify-between items-center pt-1 text-xs">
+              <span class="text-gray-400 font-medium">Ratio Riesgo / Beneficio:</span>
+              <div class="flex items-center space-x-2">
+                <span id="rrRatio" class="font-extrabold text-white text-sm">0.00 : 1</span>
+                <span id="rrBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">--</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN: EXPANDED TRADINGVIEW CHART (7-8 COLS ON PC) -->
+      <div class="lg:col-span-8 xl:col-span-9 space-y-4 flex flex-col">
+        <section class="bg-binanceCard rounded-xl p-3 sm:p-4 border border-binanceBorder shadow-xl space-y-3 flex-1 flex flex-col">
+          <div class="flex justify-between items-center px-1">
+            <div class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-accentYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z"></path></svg>
+              <h2 class="text-xs font-bold text-gray-300 tracking-wide uppercase">Gráfico Técnico Interactivo</h2>
+            </div>
+            <div class="flex space-x-2">
+              <span class="text-[10px] font-bold bg-binanceInput text-gray-400 px-2 py-0.5 rounded border border-gray-700">SMA 50,75,100,150,200</span>
+              <span class="text-[10px] font-bold bg-binanceInput text-gray-400 px-2 py-0.5 rounded border border-gray-700">RSI & VOL</span>
+            </div>
+          </div>
+          <!-- Chart container height adjusts dynamically for PC vs Mobile -->
+          <div id="tradingview_container" class="h-[600px] lg:h-[820px] xl:h-[88vh] min-h-[600px] w-full rounded-lg overflow-hidden border border-binanceBorder bg-binanceBg flex-1"></div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
