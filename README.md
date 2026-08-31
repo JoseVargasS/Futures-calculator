@@ -56,6 +56,17 @@ Calculadora de futuros con buscador universal, live price WS/polling y gráfico 
 - **Precio** — `< $1` → mínimo 4 decimales y 4 dígitos significativos (`decimalsForPrice = -floor(log10)+3`)
 - **Gráfico** — `MEXC:` / `BINANCE:` + `withdateranges`, `hide_side_toolbar: false` para trazos
 
+## Uso
+
+1. Arriba elige **MEXC / BINANCE** y **FUTURES / SPOT** (por defecto `MEXC FUTURES`).
+2. En el buscador escribe `BTC`, `SUI`, `PEPE` — se filtra en vivo, `Enter` o click para elegir. En futuros ves `SUIUSDT` sin slash.
+3. Mira **Precio Live** arriba a la izquierda (viene por WebSocket de MEXC `wss://contract.mexc.com/edge` o Binance) y dale a **Fijar Entrada** para copiarlo.
+4. En la calculadora elige **LONG/SHORT**, pon **Margen** y **Apalancamiento** (1x-50x), ajusta **Entrada**, **Take Profit** y **Stop Loss** (o cambia a **Modo ROE %**).
+5. Abajo ves **Valor Posición**, **Liquidación estimada**, **Ganancia TP**, **Pérdida SL** y **Ratio Riesgo/Beneficio** con badge `EXCELENTE / ACEPTABLE / DESFAVORABLE`.
+6. A la derecha el **Gráfico TradingView** ya viene con `SMA` y `RSI` — usa la barra lateral izquierda para trazar líneas, Fibo y demás (ahora habilitada). Cambia `ES ↔ EN` arriba a la derecha, se guarda en tu navegador.
+
+Tip: pares chicos `< $1` muestran 4 decimales y 4 dígitos significativos (ej: `0.00004231`) para no perder precisión.
+
 ## Scripts
 
 ```bash
@@ -63,14 +74,5 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # tsc && vite build → dist/
 npm run preview
+npm run test:run # 64 tests
 ```
-
-## Migración desde legacy
-
-`legacy/calculadora_futuros_v2.html` + `style.css` + `app.js` movidos a `legacy/`. El nuevo `index.html` es el entry minimal de Vite; `src/` separa CSS (`index.css` + `@theme`) y JS (hooks/lib/components).
-
-## Próximos pasos sugeridos
-
-- Añadir `zustand` o `jotai` si crece el estado
-- Tests: `vitest` + `react-testing-library` para `formatPrice` y `useLivePrice`
-- `shadcn/ui` si se quiere sistema de componentes consistente
