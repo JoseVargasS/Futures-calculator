@@ -6,6 +6,7 @@ import path from "node:path";
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   publicDir: "public",
+  base: "/Futures-calculator/",
   resolve: {
     alias: {
       "@": path.resolve(process.cwd(), "./src"),
