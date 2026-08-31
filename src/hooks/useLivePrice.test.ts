@@ -60,4 +60,39 @@ describe("useLivePrice", () => {
     // para SPOT usa poll, no WS futures -> espera fetch
     await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
   });
+
+  it("filtra mensaje con símbolo distinto y maneja ping/pong", async () => {
+    const { result } = renderHook(() => useLivePrice("BTC_USDT", "MEXC", "FUTURES"));
+    await waitFor(() => expect(MockWs.last?.url).toBe("wss://contract.mexc.com/edge"));
+    MockWs.last?.triggerOpen();
+    // ping -> debe responder pong
+    MockWs.last?.triggerMessage({ method: "ping" });
+    expect(MockWs.last?.sent).toContain(JSON.stringify({ method: "pong" }));
+    // pong channel ignorado
+    MockWs.last?.triggerMessage({ channel: "pong" });
+    // mensaje con símbolo distinto ignorado
+    MockWs.last?.triggerMessage({ data: { symbol: "ETH_USDT", lastPrice: "999", riseFallRate: "0.05" } });
+    await new Promise((r) => setTimeout(r, 10));
+    expect(result.current.price).toBe(0);
+    // mensaje válido
+    MockWs.last?.triggerMessage({ data: { symbol: "BTC_USDT", lastPrice: "123", riseFallRate: "0.01" } });
+    await waitFor(() => expect(result.current.price).toBe(123));
+  });
+
+  it("WS onerror hace fallback a poll", async () => {
+    const fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(new Response(JSON.stringify({ success: true, data: { lastPrice: "77780", riseFallRate: "0.01" } }), { status: 200 }));
+    const { result } = renderHook(() => useLivePrice("BTC_USDT", "MEXC", "FUTURES"));
+    await waitFor(() => expect(MockWs.last?.url).toBe("wss://contract.mexc.com/edge"));
+    MockWs.last?.onerror?.();
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
+    // onclose limpia intervalo
+    MockWs.last?.onclose?.();
+    expect(result.current.price).toBeDefined();
+  });
+
+  it("ignora símbolo vacío", async () => {
+    renderHook(() => useLivePrice("", "MEXC", "FUTURES"));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(MockWs.last).toBeNull();
+  });
 });

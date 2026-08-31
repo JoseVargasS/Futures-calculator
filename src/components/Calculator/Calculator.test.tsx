@@ -50,4 +50,50 @@ describe("Calculator", () => {
     });
     expect(await screen.findByText("$0.00004019")).toBeInTheDocument();
   });
+
+  it("edita TP/SL en modo $ y cambia margen/leverage/entry", async () => {
+    const user = userEvent.setup();
+    render(<Calculator livePrice={65000} />);
+    // edita margen
+    const margin = screen.getByDisplayValue("100") as HTMLInputElement;
+    await user.clear(margin);
+    await user.type(margin, "200");
+    expect(screen.getByText("$4,000.00")).toBeInTheDocument(); // 200*20
+    // edita entry
+    const entry = screen.getByDisplayValue("65000") as HTMLInputElement;
+    await user.clear(entry);
+    await user.type(entry, "60000");
+    expect(screen.getByText("0.0667 Contratos")).toBeInTheDocument(); // 4000/60000
+    // edita TP en modo $
+    const tp = screen.getByDisplayValue("68000") as HTMLInputElement;
+    await user.clear(tp);
+    await user.type(tp, "70000");
+    expect(screen.getByText(/Precio TP:/)).toHaveTextContent("$70,000.00");
+    // cambia leverage
+    const lev = screen.getByDisplayValue("20x") as HTMLSelectElement;
+    await user.selectOptions(lev, "10");
+    expect(lev.value).toBe("10");
+  });
+
+  it("cubre badge DESFAVORABLE y SHORT en ROE", async () => {
+    const user = userEvent.setup();
+    render(<Calculator livePrice={65000} />);
+    await user.click(screen.getByText("SHORT"));
+    await user.click(screen.getByText("Modo ROE %"));
+    const tpPct = screen.getByDisplayValue("92.31") as HTMLInputElement;
+    const slPct = screen.getByDisplayValue("46.15") as HTMLInputElement;
+    await user.clear(tpPct);
+    await user.type(tpPct, "10");
+    await user.clear(slPct);
+    await user.type(slPct, "50");
+    // rr = 10/50 = 0.2 -> DESFAVORABLE
+    expect(await screen.findByText("DESFAVORABLE")).toBeInTheDocument();
+    // vuelve a LONG y ACEPTABLE
+    await user.click(screen.getByText("LONG"));
+    await user.clear(tpPct);
+    await user.type(tpPct, "30");
+    await user.clear(slPct);
+    await user.type(slPct, "20");
+    expect(await screen.findByText("ACEPTABLE")).toBeInTheDocument();
+  });
 });
