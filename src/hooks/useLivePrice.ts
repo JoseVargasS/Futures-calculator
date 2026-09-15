@@ -241,7 +241,8 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
     (sym: string) => {
       stop();
       fetchMexcTicker(sym);
-      pollRef.current = window.setInterval(() => fetchMexcTicker(sym), 3000);
+      // ponytail: 5s para no quemar el rate-limit de los proxies gratuitos
+      pollRef.current = window.setInterval(() => fetchMexcTicker(sym), 5000);
     },
     [fetchMexcTicker, stop],
   );

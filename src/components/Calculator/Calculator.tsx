@@ -22,13 +22,13 @@ export function Calculator({ livePrice }: Props) {
   const { t } = useI18n();
   const [direction, setDirection] = useState<Direction>("LONG");
   const [tpSlMode, setTpSlMode] = useState<TpSlMode>("PRICE");
-  const [margin, setMargin] = useState(100);
-  const [leverage, setLeverage] = useState(20);
+  const [margin, setMargin] = useState(1000);
+  const [leverage, setLeverage] = useState(10);
   const [entry, setEntry] = useState(65000);
   const [tpPrice, setTpPrice] = useState(68000);
   const [slPrice, setSlPrice] = useState(63500);
-  const [tpPct, setTpPct] = useState(92.31);
-  const [slPct, setSlPct] = useState(46.15);
+  const [tpPct, setTpPct] = useState(20);
+  const [slPct, setSlPct] = useState(10);
 
   const posValue = margin * leverage;
   const tokens = entry > 0 ? posValue / entry : 0;
