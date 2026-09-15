@@ -1,25 +1,103 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-binanceBg: #0b0e11;
-  --color-binanceCard: #1e2329;
-  --color-binanceInput: #2b313a;
-  --color-binanceBorder: #2b313a;
-  --color-accentGreen: #0ecb81;
-  --color-accentRed: #f6465d;
+  --color-binanceBg: #121212;
+  --color-binanceCard: #1a1a1c;
+  --color-binanceInput: #232326;
+  --color-binanceBorder: #2a2a2e;
+  --color-accentGreen: #25a750;
+  --color-accentRed: #e54349;
   --color-accentYellow: #f0b90b;
-  --color-accentGreenBg: rgba(14, 203, 129, 0.1);
-  --color-accentRedBg: rgba(246, 70, 93, 0.1);
-  --font-sans: Inter, sans-serif;
+  --color-accentGreenBg: rgba(37, 167, 80, 0.12);
+  --color-accentRedBg: rgba(229, 67, 73, 0.12);
+  /* ponytail: una sola curva de easing + sombras suaves teñidas al fondo, sin degradados */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Glass OKX sutil: solo translucidez + blur en fijos/dropdowns, cards planos translúcidos */
+  --color-glass-strong: #171719;
+  --color-glass-border: rgb(255 255 255 / 0.08);
+  /* Superficies OKX: separan por tono, no por borde. Hairline solo en zonas importantes. */
+  --color-surface: #1a1a1c;
+  --color-field: #232326;
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px rgb(0 0 0 / 0.25);
+  --shadow-lg: 0 1px 2px rgb(0 0 0 / 0.45), 0 8px 24px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 2px 4px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-2xl: 0 2px 4px rgb(0 0 0 / 0.45), 0 16px 48px rgb(0 0 0 / 0.45);
+  /* Stack default OKX (OKXSans es propietaria; si no está instalada, cae al sistema como en okx.com) */
+  --font-sans: "OKXSans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 
-* {
-  font-family: Inter, sans-serif;
+/* Regla de radios: cards rounded-xl, inputs/botones rounded-lg, thumbs rounded-md, solo badges en pill. */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* Números de cockpit: ancho fijo para que el precio no salte al actualizarse. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accentYellow);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Vidrio solo en elementos fijos o flotantes (header, dropdowns): blur barato en GPU. */
+.glass-fixed {
+  background: rgb(18 18 18 / 0.78);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-fixed {
+    background: var(--color-glass-strong);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Entrada escalonada solo con transform+opacity; respeta reduced-motion. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 560ms var(--ease-out-expo) both;
+  animation-delay: var(--rise-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-rise {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 ::-webkit-scrollbar {
@@ -27,10 +105,10 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0e11;
+  background: #121212;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b313a;
+  background: #2e2e33;
   border-radius: 3px;
 }
 input[type="number"]::-webkit-inner-spin-button,
@@ -44,7 +122,6 @@ input[type="number"] {
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

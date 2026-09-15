@@ -68,23 +68,23 @@ export default function App() {
         onSymbolChange={handleSymbolChange}
       />
 
-      <main className="w-full px-1 pt-3 sm:px-2 lg:px-3">
-        <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12 lg:gap-3">
-          <div className="space-y-4 lg:col-span-4 xl:col-span-3">
+      <main className="mx-auto w-full max-w-[1600px] px-2 pt-3 sm:px-3 lg:px-4">
+        <div className="grid grid-cols-1 items-stretch gap-2.5 lg:grid-cols-12 lg:gap-3">
+          <div className="space-y-2.5 lg:col-span-4 xl:col-span-3">
             <TickerCard exchange={exchange} market={market} price={price} changePct={changePct} />
             <Calculator livePrice={price} />
           </div>
 
           <div className="flex flex-col space-y-4 lg:col-span-8 xl:col-span-9">
-            <section className="flex flex-1 flex-col space-y-3 rounded-xl border border-binanceBorder bg-binanceCard p-3 shadow-xl sm:p-4">
-              <div className="flex items-center justify-between px-1">
+            <section className="animate-rise flex flex-1 flex-col space-y-3 rounded-xl border border-white/10 bg-surface p-3 shadow-xl sm:p-4" style={{ ["--rise-delay" as string]: "160ms" }}>
+              <div className="flex items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-2">
-                  <svg className="h-4 w-4 text-accentYellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z" /></svg>
-                  <h2 className="text-xs font-bold uppercase tracking-wide text-gray-300">{t.chart.title}</h2>
+                  <svg className="h-4 w-4 shrink-0 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z" /></svg>
+                  <h2 className="text-xs font-extrabold uppercase tracking-wider text-white">{t.chart.title}</h2>
                 </div>
-                <div className="flex gap-2">
-                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.sma}</span>
-                  <span className="rounded border border-gray-700 bg-binanceInput px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.rsiVol}</span>
+                <div className="flex gap-1.5">
+                  <span className="tnum rounded-full bg-field px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.sma}</span>
+                  <span className="tnum rounded-full bg-field px-2 py-0.5 text-[10px] font-bold text-gray-400">{t.chart.rsiVol}</span>
                 </div>
               </div>
               <TradingViewChart symbol={tvSymbol} exchange={exchange} locale={chartLocale} />

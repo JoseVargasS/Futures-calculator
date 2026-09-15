@@ -7,7 +7,7 @@ describe("TickerCard", () => {
     render(<TickerCard exchange="MEXC" market="FUTURES" price={77493.7} changePct={-1.64} />);
     expect(screen.getByText("Precio Live MEXC — FUTURES")).toBeInTheDocument();
     expect(screen.getByText("$77,493.70")).toBeInTheDocument();
-    expect(screen.getByText("-1.64%")).toBeInTheDocument();
+    expect(screen.getByText("▼ -1.64%")).toBeInTheDocument();
   });
   it("precio <1 con 4 decimales", () => {
     render(<TickerCard exchange="MEXC" market="FUTURES" price={0.00004231} changePct={2} />);

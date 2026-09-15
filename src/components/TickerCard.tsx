@@ -15,16 +15,19 @@ export const TickerCard = memo(function TickerCard({ exchange, market, price, ch
   const triggerFix = () => window.dispatchEvent(new Event("fix-entry"));
 
   return (
-    <section className="flex items-center justify-between rounded-xl border border-binanceBorder bg-binanceCard p-4 shadow-lg">
-      <div>
-        <span className="block text-[11px] font-medium uppercase tracking-wider text-gray-400">{t.ticker.live} {exchange} — {market}</span>
-        <div className="mt-0.5 flex items-baseline gap-2">
-          <span className="text-2xl font-black tracking-tight text-accentYellow">{price ? fmtPrice(price) : "$--.--"}</span>
-          <span className={`text-xs font-semibold ${changePct >= 0 ? "text-accentGreen" : "text-accentRed"}`}>{changePct >= 0 ? `+${changePct.toFixed(2)}%` : `${changePct.toFixed(2)}%`}</span>
+    <section className="animate-rise flex items-center justify-between gap-3 rounded-xl bg-surface p-4" aria-live="polite">
+      <div className="min-w-0">
+        <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accentGreen" aria-hidden="true" />
+          {t.ticker.live} {exchange} — {market}
+        </span>
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <span className="tnum text-[28px] font-extrabold leading-none tracking-tight text-accentYellow">{price ? fmtPrice(price) : "$--.--"}</span>
+          <span className={`tnum text-xs font-bold ${changePct >= 0 ? "text-accentGreen" : "text-accentRed"}`}>{changePct >= 0 ? `▲ +${changePct.toFixed(2)}%` : `▼ ${changePct.toFixed(2)}%`}</span>
         </div>
       </div>
-      <button onClick={triggerFix} className="flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-xs font-semibold text-accentYellow shadow transition hover:bg-gray-700 active:scale-95">
-        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+      <button onClick={triggerFix} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-extrabold text-black transition-all duration-200 ease-out-expo hover:bg-gray-200 active:scale-[0.97]">
+        <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z" /></svg>
         <span>{t.ticker.setEntry}</span>
       </button>
     </section>

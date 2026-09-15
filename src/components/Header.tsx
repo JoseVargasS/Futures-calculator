@@ -15,53 +15,63 @@ type Props = {
 
 export const Header = memo(function Header({ exchange, market, symbols, currentSymbol, onExchangeChange, onMarketChange, onSymbolChange }: Props) {
   const { lang, setLang, isPending } = useI18n() as ReturnType<typeof useI18n> & { isPending?: boolean };
+  const segBtn =
+    "min-h-8 rounded-full px-2.5 py-1 text-[11px] font-bold transition-all duration-200 ease-out-expo active:scale-[0.97]";
   return (
-    <header className="sticky top-0 z-50 border-b border-binanceBorder bg-binanceCard/90 px-2 py-3 shadow-md backdrop-blur-md lg:px-3">
-      <div className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="h-3 w-3 animate-pulse rounded-full bg-accentYellow" />
-            <h1 className="text-lg font-black tracking-wide text-white">FUTURES PRO</h1>
-          </div>
+    <header className="glass-fixed sticky top-0 z-50 border-b border-white/10 px-2 py-2.5 lg:px-3">
+      <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-2">
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white" aria-hidden="true">
+            <svg className="h-4 w-4 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11L9.5 22 19 10h-6.5L13 2z" /></svg>
+          </span>
+          <h1 className="text-[15px] font-extrabold tracking-tight text-white">FUTURES PRO</h1>
+          <span className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-accentGreen sm:flex" aria-hidden="true">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accentGreen" />
+            LIVE
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <div className="flex items-center rounded-lg border border-binanceBorder bg-binanceBg p-0.5">
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
+          <div className="flex items-center gap-0.5 rounded-full bg-field p-1" role="group" aria-label="Exchange">
             <button
               onClick={() => onExchangeChange("MEXC")}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-black ${exchange === "MEXC" ? "bg-accentYellow text-black shadow" : "text-gray-400 hover:text-white"}`}
+              aria-pressed={exchange === "MEXC"}
+              className={`${segBtn} ${exchange === "MEXC" ? "bg-white font-extrabold text-black" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               MEXC
             </button>
             <button
               onClick={() => onExchangeChange("BINANCE")}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-black ${exchange === "BINANCE" ? "bg-accentYellow text-black shadow" : "text-gray-400 hover:text-white"}`}
+              aria-pressed={exchange === "BINANCE"}
+              className={`${segBtn} ${exchange === "BINANCE" ? "bg-white font-extrabold text-black" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               BINANCE
             </button>
           </div>
 
-          <div className="flex items-center rounded-lg border border-binanceBorder bg-binanceBg p-0.5">
+          <div className="flex items-center gap-0.5 rounded-full bg-field p-1" role="group" aria-label="Market">
             <button
               onClick={() => onMarketChange("FUTURES")}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-bold ${market === "FUTURES" ? "border border-gray-700 bg-binanceInput text-accentYellow" : "text-gray-400 hover:text-white"}`}
+              aria-pressed={market === "FUTURES"}
+              className={`${segBtn} ${market === "FUTURES" ? "bg-white/15 font-extrabold text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               FUTURES
             </button>
             <button
               onClick={() => onMarketChange("SPOT")}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-bold ${market === "SPOT" ? "border border-gray-700 bg-binanceInput text-accentYellow" : "text-gray-400 hover:text-white"}`}
+              aria-pressed={market === "SPOT"}
+              className={`${segBtn} ${market === "SPOT" ? "bg-white/15 font-extrabold text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               SPOT
             </button>
           </div>
 
-          <div className="flex items-center rounded-lg border border-binanceBorder bg-binanceBg p-0.5" aria-label="Language">
+          <div className="flex items-center gap-0.5 rounded-full bg-field p-1" role="group" aria-label="Language">
             <button
               onClick={() => setLang("es")}
               aria-pressed={lang === "es"}
               disabled={!!isPending}
-              className={`rounded-md px-2 py-1 text-[11px] font-bold transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "es" ? "bg-binanceInput text-white shadow" : "text-gray-400 hover:text-white"}`}
+              className={`${segBtn} transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "es" ? "bg-white/15 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               ES
             </button>
@@ -69,7 +79,7 @@ export const Header = memo(function Header({ exchange, market, symbols, currentS
               onClick={() => setLang("en")}
               aria-pressed={lang === "en"}
               disabled={!!isPending}
-              className={`rounded-md px-2 py-1 text-[11px] font-bold transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "en" ? "bg-binanceInput text-white shadow" : "text-gray-400 hover:text-white"}`}
+              className={`${segBtn} transition-opacity ${isPending ? "opacity-50" : ""} ${lang === "en" ? "bg-white/15 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
             >
               EN
             </button>

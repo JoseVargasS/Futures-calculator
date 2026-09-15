@@ -81,7 +81,7 @@ export function Calculator({ livePrice }: Props) {
     rr >= 2
       ? { label: t.calculator.badgeExcellent, cls: "bg-accentGreen/20 text-accentGreen border-accentGreen/30" }
       : rr >= 1.5
-        ? { label: t.calculator.badgeAcceptable, cls: "bg-accentYellow/20 text-accentYellow border-accentYellow/30" }
+        ? { label: t.calculator.badgeAcceptable, cls: "bg-white/10 text-white border-white/20" }
         : { label: t.calculator.badgeUnfavorable, cls: "bg-accentRed/20 text-accentRed border-accentRed/30" };
 
   const fixEntry = useCallback(() => {
@@ -105,31 +105,31 @@ export function Calculator({ livePrice }: Props) {
 
   return (
     <>
-      <section className="space-y-4 rounded-xl border border-binanceBorder bg-binanceCard p-4 shadow-xl">
-        <div className="flex items-center justify-between border-b border-binanceBorder pb-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-300">{t.calculator.title}</h2>
-          <div className="flex items-center rounded-lg border border-binanceBorder bg-binanceBg p-0.5">
-            <button onClick={() => setTpSlMode("PRICE")} className={`rounded px-2 py-0.5 text-[10px] font-bold ${tpSlMode === "PRICE" ? "border border-gray-700 bg-binanceInput text-accentYellow" : "text-gray-400 hover:text-white"}`}>{t.calculator.modeDollar}</button>
-            <button onClick={() => setTpSlMode("PCT")} className={`rounded px-2 py-0.5 text-[10px] font-bold ${tpSlMode === "PCT" ? "border border-gray-700 bg-binanceInput text-accentYellow" : "text-gray-400 hover:text-white"}`}>{t.calculator.modeRoe}</button>
+      <section className="animate-rise space-y-4 rounded-xl border border-white/10 bg-surface p-4 shadow-xl" style={{ ["--rise-delay" as string]: "90ms" }}>
+        <div className="flex items-center justify-between border-b border-white/5 pb-3">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-white">{t.calculator.title}</h2>
+          <div className="flex items-center gap-0.5 rounded-full bg-field p-1" role="group" aria-label="TP/SL mode">
+            <button onClick={() => setTpSlMode("PRICE")} aria-pressed={tpSlMode === "PRICE"} className={`min-h-8 rounded-full px-2.5 py-1 text-[10px] font-bold transition-all duration-200 ease-out-expo active:scale-[0.97] ${tpSlMode === "PRICE" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.modeDollar}</button>
+            <button onClick={() => setTpSlMode("PCT")} aria-pressed={tpSlMode === "PCT"} className={`min-h-8 rounded-full px-2.5 py-1 text-[10px] font-bold transition-all duration-200 ease-out-expo active:scale-[0.97] ${tpSlMode === "PCT" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.modeRoe}</button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 rounded-lg border border-binanceBorder bg-binanceBg p-1">
-          <button onClick={() => setDirection("LONG")} className={`flex items-center justify-center gap-1 rounded-md py-2.5 text-sm font-bold transition-all ${direction === "LONG" ? "bg-accentGreen text-gray-950 shadow-md" : "text-gray-400 hover:text-white"}`}>{t.calculator.long} <span>↗</span></button>
-          <button onClick={() => setDirection("SHORT")} className={`flex items-center justify-center gap-1 rounded-md py-2.5 text-sm font-bold transition-all ${direction === "SHORT" ? "bg-accentRed text-white shadow-md" : "text-gray-400 hover:text-white"}`}>{t.calculator.short} <span>↘</span></button>
+        <div className="grid grid-cols-2 gap-1 rounded-full bg-field p-1" role="group" aria-label="Direction">
+          <button onClick={() => setDirection("LONG")} aria-pressed={direction === "LONG"} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "LONG" ? "bg-accentGreen text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.long} <span aria-hidden="true">↗</span></button>
+          <button onClick={() => setDirection("SHORT")} aria-pressed={direction === "SHORT"} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "SHORT" ? "bg-accentRed text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.short} <span aria-hidden="true">↘</span></button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-[11px] font-semibold text-gray-400">{t.calculator.margin}</label>
+            <label className="mb-1.5 block text-[11px] font-semibold text-gray-400">{t.calculator.margin}</label>
             <div className="relative">
-              <span className="absolute left-3 top-2 text-sm font-bold text-gray-500">$</span>
-              <input type="number" value={margin || ""} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow" />
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500" aria-hidden="true">$</span>
+              <input type="number" value={margin || ""} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold text-gray-400">{t.calculator.leverage}</label>
-            <select value={leverage} onChange={(e) => setLeverage(parseInt(e.target.value))} className="w-full cursor-pointer rounded-lg border border-binanceBorder bg-binanceInput px-3 py-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow">
+            <label className="mb-1.5 block text-[11px] font-semibold text-gray-400">{t.calculator.leverage}</label>
+            <select value={leverage} onChange={(e) => setLeverage(parseInt(e.target.value))} className="tnum min-h-11 w-full cursor-pointer rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25">
               {LEVERAGES.map((v) => (
                 <option key={v} value={v}>{v}x</option>
               ))}
@@ -138,81 +138,81 @@ export function Calculator({ livePrice }: Props) {
         </div>
 
         <div>
-          <div className="mb-1 flex items-center justify-between">
+          <div className="mb-1.5 flex items-center justify-between">
             <label className="text-[11px] font-semibold text-gray-400">{t.calculator.entryPrice}</label>
-            <span className="font-mono text-[10px] text-gray-500">{tokens.toFixed(4)} {t.calculator.contracts}</span>
+            <span className="tnum font-mono text-[10px] text-gray-500">{tokens.toFixed(4)} {t.calculator.contracts}</span>
           </div>
-          <input type="number" value={entry} onChange={(e) => setEntry(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput px-3 py-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow" />
+          <input type="number" value={entry} onChange={(e) => setEntry(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
         </div>
 
         {tpSlMode === "PRICE" ? (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-accentGreen">{t.calculator.takeProfit}</label>
-              <input type="number" value={tpPrice} onChange={(e) => setTpPrice(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput px-3 py-2 text-sm font-bold text-accentGreen outline-none transition focus:border-accentGreen" />
+              <label className="mb-1.5 block text-[11px] font-semibold text-accentGreen">{t.calculator.takeProfit}</label>
+              <input type="number" value={tpPrice} onChange={(e) => setTpPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-accentRed">{t.calculator.stopLoss}</label>
-              <input type="number" value={slPrice} onChange={(e) => setSlPrice(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput px-3 py-2 text-sm font-bold text-accentRed outline-none transition focus:border-accentRed" />
+              <label className="mb-1.5 block text-[11px] font-semibold text-accentRed">{t.calculator.stopLoss}</label>
+              <input type="number" value={slPrice} onChange={(e) => setSlPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-accentGreen">{t.calculator.targetRoe}</label>
+              <label className="mb-1.5 block text-[11px] font-semibold text-accentGreen">{t.calculator.targetRoe}</label>
               <div className="relative">
-                <input type="number" value={tpPct} onChange={(e) => setTpPct(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput py-2 pl-3 pr-6 text-sm font-bold text-accentGreen outline-none transition focus:border-accentGreen" />
-                <span className="absolute right-2.5 top-2 text-xs font-bold text-accentGreen">%</span>
+                <input type="number" value={tpPct} onChange={(e) => setTpPct(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
+                <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-accentGreen" aria-hidden="true">%</span>
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold text-accentRed">{t.calculator.limitRoe}</label>
+              <label className="mb-1.5 block text-[11px] font-semibold text-accentRed">{t.calculator.limitRoe}</label>
               <div className="relative">
-                <input type="number" value={slPct} onChange={(e) => setSlPct(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput py-2 pl-3 pr-6 text-sm font-bold text-accentRed outline-none transition focus:border-accentRed" />
-                <span className="absolute right-2.5 top-2 text-xs font-bold text-accentRed">%</span>
+                <input type="number" value={slPct} onChange={(e) => setSlPct(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
+                <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-accentRed" aria-hidden="true">%</span>
               </div>
             </div>
           </div>
         )}
 
-        <div className="space-y-3 rounded-xl border border-binanceBorder bg-binanceBg p-3.5">
-          <div className="grid grid-cols-2 gap-2 border-b border-binanceBorder pb-2.5 text-xs">
+        <div className="space-y-3 rounded-xl bg-black/40 p-3.5">
+          <div className="grid grid-cols-2 gap-2 border-b border-white/5 pb-2.5 text-xs">
             <div>
-              <span className="block text-[10px] font-bold uppercase text-gray-500">{t.calculator.positionValue}</span>
-              <span className="text-sm font-extrabold text-white">${posValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-500">{t.calculator.positionValue}</span>
+              <span className="tnum text-sm font-extrabold text-white">${posValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div>
-              <span className="block text-[10px] font-bold uppercase text-gray-500">{t.calculator.liquidationPrice}</span>
-              <span className="text-sm font-extrabold text-accentYellow">{fmtPrice(liq)}</span>
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-500">{t.calculator.liquidationPrice}</span>
+              <span className="tnum text-sm font-extrabold text-white">{fmtPrice(liq)}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-accentGreen/20 bg-accentGreenBg p-2.5">
+          <div className="flex items-center justify-between rounded-lg bg-accentGreenBg p-2.5">
             <div>
               <span className="block text-[10px] font-bold uppercase tracking-wider text-accentGreen">{t.calculator.tpTargetProfit}</span>
-              <span className="text-base font-black text-accentGreen">+${Math.abs(tpProfitUsd).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="tnum text-base font-extrabold text-accentGreen">+${Math.abs(tpProfitUsd).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div className="text-right">
-              <span className="block text-xs font-extrabold text-accentGreen">+{tpRoe.toFixed(2)}% ROE</span>
-              <span className="block text-[10px] text-gray-400">{t.calculator.tpPrice}: {fmtPrice(tpSlMode === "PRICE" ? tpPrice : syncedTpPrice)}</span>
+              <span className="tnum block text-xs font-extrabold text-accentGreen">+{tpRoe.toFixed(2)}% ROE</span>
+              <span className="tnum block text-[10px] text-gray-400">{t.calculator.tpPrice}: {fmtPrice(tpSlMode === "PRICE" ? tpPrice : syncedTpPrice)}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-accentRed/20 bg-accentRedBg p-2.5">
+          <div className="flex items-center justify-between rounded-lg bg-accentRedBg p-2.5">
             <div>
               <span className="block text-[10px] font-bold uppercase tracking-wider text-accentRed">{t.calculator.slLimitRisk}</span>
-              <span className="text-base font-black text-accentRed">-${Math.abs(slLossUsd).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              <span className="tnum text-base font-extrabold text-accentRed">-${Math.abs(slLossUsd).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div className="text-right">
-              <span className="block text-xs font-extrabold text-accentRed">-{Math.abs(slRoe).toFixed(2)}% ROE</span>
-              <span className="block text-[10px] text-gray-400">{t.calculator.slPrice}: {fmtPrice(tpSlMode === "PRICE" ? slPrice : syncedSlPrice)}</span>
+              <span className="tnum block text-xs font-extrabold text-accentRed">-{Math.abs(slRoe).toFixed(2)}% ROE</span>
+              <span className="tnum block text-[10px] text-gray-400">{t.calculator.slPrice}: {fmtPrice(tpSlMode === "PRICE" ? slPrice : syncedSlPrice)}</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-1 text-xs">
             <span className="font-medium text-gray-400">{t.calculator.riskReward}</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-white">{rr > 0 ? rr.toFixed(2) : "0.00"} : 1</span>
+              <span className="tnum text-sm font-extrabold text-white">{rr > 0 ? rr.toFixed(2) : "0.00"} : 1</span>
               <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${badge.cls}`}>{badge.label}</span>
             </div>
           </div>

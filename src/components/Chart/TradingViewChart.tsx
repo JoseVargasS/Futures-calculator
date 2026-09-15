@@ -45,5 +45,5 @@ export const TradingViewChart = memo(function TradingViewChart({ symbol, exchang
     return () => cancelAnimationFrame(id);
   }, [symbol, exchange, locale]);
 
-  return <div id="tradingview_container" className="h-[600px] min-h-[600px] w-full flex-1 overflow-hidden rounded-lg border border-binanceBorder bg-binanceBg lg:h-[820px] xl:h-[88vh]" />;
+  return <div id="tradingview_container" className="h-[600px] min-h-[600px] w-full flex-1 overflow-hidden rounded-lg border border-white/10 bg-black lg:h-[820px] xl:h-[88vh]" />;
 });

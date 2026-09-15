@@ -86,13 +86,16 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
           }}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
-          className="w-[155px] rounded-lg border border-binanceBorder bg-binanceInput py-1.5 pl-8 pr-7 text-sm font-bold uppercase text-white placeholder:font-medium placeholder:text-gray-500 focus:border-accentYellow focus:outline-none sm:w-[200px]"
+          aria-expanded={open}
+          aria-autocomplete="list"
+          role="combobox"
+          className="tnum min-h-10 w-[155px] rounded-lg bg-field py-1.5 pl-8 pr-7 text-sm font-bold uppercase text-white outline-none transition-shadow duration-200 placeholder:font-medium placeholder:text-gray-500 focus:ring-2 focus:ring-white/25 sm:w-[200px]"
         />
         <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500">{symbols.length} {t.assetPicker.pairs}</span>
       </div>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-1.5 max-h-[320px] w-full overflow-y-auto rounded-lg border border-binanceBorder bg-binanceCard shadow-2xl">
+        <div role="listbox" aria-label={t.assetPicker.placeholder} className="glass-fixed animate-rise absolute right-0 z-50 mt-1.5 max-h-[320px] w-full min-w-[220px] origin-top-right overflow-y-auto rounded-lg border border-white/10 shadow-2xl">
           {filtered.length === 0 ? (
             <div className="px-3 py-4 text-center text-xs text-gray-500">{t.assetPicker.noResults}</div>
           ) : (
@@ -102,17 +105,19 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
                 <button
                   key={sym}
                   type="button"
+                  role="option"
+                  aria-selected={isCur}
                   onClick={() => handleSelect(sym)}
-                  className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-xs font-bold transition hover:bg-binanceInput ${highlight === idx ? "!bg-binanceInput !text-accentYellow" : isCur ? "bg-binanceInput text-accentYellow" : "text-gray-300"}`}
+                  className={`tnum flex min-h-9 w-full items-center justify-between px-3 py-2 text-left text-xs font-bold transition-colors duration-150 hover:bg-white/10 ${highlight === idx ? "!bg-white/10 !text-white" : isCur ? "bg-white/5 text-white" : "text-gray-300"}`}
                 >
                   <span>{displaySym(sym, market)}</span>
-                  <span className={`text-[10px] ${isCur ? "text-accentYellow" : "text-gray-500"}`}>{isCur ? t.assetPicker.current : ""}</span>
+                  <span className={`text-[10px] ${isCur ? "text-white" : "text-gray-500"}`}>{isCur ? t.assetPicker.current : ""}</span>
                 </button>
               );
             })
           )}
           {hasMore > 0 && (
-            <div className="border-t border-binanceBorder px-3 py-1.5 text-center text-[10px] text-gray-500">+{hasMore} {t.assetPicker.more}</div>
+            <div className="border-t border-white/10 px-3 py-1.5 text-center text-[10px] text-gray-500">+{hasMore} {t.assetPicker.more}</div>
           )}
         </div>
       )}
