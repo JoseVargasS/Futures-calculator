@@ -24,7 +24,7 @@ describe("App", () => {
     renderApp();
     expect(screen.getByText("FUTURES PRO")).toBeInTheDocument();
     expect(screen.getByText("Precio Live MEXC — FUTURES")).toBeInTheDocument();
-    expect(screen.getByText("Gráfico Técnico Interactivo")).toBeInTheDocument();
+    expect(screen.getByText("GRÁFICO")).toBeInTheDocument();
     expect(screen.getByText("Calculadora de Operación")).toBeInTheDocument();
   });
 
@@ -53,7 +53,7 @@ describe("App", () => {
     await user.click(screen.getByText("EN"));
     await waitFor(() => expect(screen.getByText("Live Price MEXC — FUTURES")).toBeInTheDocument());
     expect(screen.getByText("Trading Calculator")).toBeInTheDocument();
-    expect(screen.getByText("Interactive Technical Chart")).toBeInTheDocument();
+    expect(screen.getByText("CHART")).toBeInTheDocument();
     await user.click(screen.getByText("ES"));
     await waitFor(() => expect(screen.getByText("Precio Live MEXC — FUTURES")).toBeInTheDocument());
   });

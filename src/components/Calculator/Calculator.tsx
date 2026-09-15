@@ -9,6 +9,15 @@ type Props = {
   livePrice: number;
 };
 
+// ponytail: lista fija, sin lib extra
+const LEVERAGES: number[] = [
+  ...Array.from({ length: 50 }, (_, i) => i + 1),
+  ...Array.from({ length: 10 }, (_, i) => 55 + i * 5),
+  ...Array.from({ length: 20 }, (_, i) => 110 + i * 10),
+  ...Array.from({ length: 10 }, (_, i) => 320 + i * 20),
+  ...Array.from({ length: 10 }, (_, i) => 550 + i * 50),
+];
+
 export function Calculator({ livePrice }: Props) {
   const { t } = useI18n();
   const [direction, setDirection] = useState<Direction>("LONG");
@@ -115,13 +124,13 @@ export function Calculator({ livePrice }: Props) {
             <label className="mb-1 block text-[11px] font-semibold text-gray-400">{t.calculator.margin}</label>
             <div className="relative">
               <span className="absolute left-3 top-2 text-sm font-bold text-gray-500">$</span>
-              <input type="number" value={margin} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow" />
+              <input type="number" value={margin || ""} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="w-full rounded-lg border border-binanceBorder bg-binanceInput py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow" />
             </div>
           </div>
           <div>
             <label className="mb-1 block text-[11px] font-semibold text-gray-400">{t.calculator.leverage}</label>
             <select value={leverage} onChange={(e) => setLeverage(parseInt(e.target.value))} className="w-full cursor-pointer rounded-lg border border-binanceBorder bg-binanceInput px-3 py-2 text-sm font-bold text-white outline-none transition focus:border-accentYellow">
-              {Array.from({ length: 50 }, (_, i) => i + 1).map((v) => (
+              {LEVERAGES.map((v) => (
                 <option key={v} value={v}>{v}x</option>
               ))}
             </select>

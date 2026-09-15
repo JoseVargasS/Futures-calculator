@@ -8,19 +8,37 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
   const [changePct, setChangePct] = useState<number>(0);
   const wsRef = useRef<WebSocket | null>(null);
   const pollRef = useRef<number | null>(null);
+  const pingRef = useRef<number | null>(null);
+  const reconnectRef = useRef<number | null>(null);
+  const watchdogRef = useRef<number | null>(null);
+  const retryRef = useRef(0);
+  const activeRef = useRef(true);
 
   const stop = useCallback(() => {
-    if (wsRef.current) {
+    const ws = wsRef.current;
+    wsRef.current = null;
+    if (ws) {
       try {
-        wsRef.current.close();
+        ws.close();
       } catch {
         // ignore
       }
-      wsRef.current = null;
     }
     if (pollRef.current) {
       window.clearInterval(pollRef.current);
       pollRef.current = null;
+    }
+    if (pingRef.current) {
+      window.clearInterval(pingRef.current);
+      pingRef.current = null;
+    }
+    if (reconnectRef.current) {
+      window.clearTimeout(reconnectRef.current);
+      reconnectRef.current = null;
+    }
+    if (watchdogRef.current) {
+      window.clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
     }
   }, []);
 
@@ -28,6 +46,32 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
     if (isFinite(p)) setPrice(p);
     if (isFinite(pct)) setChangePct(pct);
   }, []);
+
+  // ponytail: reconnect con backoff + watchdog que cae a poll si el WS se queda mudo
+  const scheduleReconnect = useCallback(
+    (fn: () => void) => {
+      if (!activeRef.current || reconnectRef.current != null) return;
+      const delay = Math.min(1000 * 2 ** retryRef.current, 10000);
+      retryRef.current += 1;
+      reconnectRef.current = window.setTimeout(() => {
+        reconnectRef.current = null;
+        if (!activeRef.current) return;
+        fn();
+      }, delay);
+    },
+    [],
+  );
+
+  const pokeWatchdog = useCallback(
+    (onSilent: () => void, ms = 10000) => {
+      if (watchdogRef.current) window.clearTimeout(watchdogRef.current);
+      watchdogRef.current = window.setTimeout(() => {
+        if (!activeRef.current) return;
+        onSilent();
+      }, ms);
+    },
+    [],
+  );
 
   const fetchMexcTicker = useCallback(
     async (sym: string) => {
@@ -62,37 +106,95 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
   const connectBinance = useCallback(
     (sym: string) => {
       stop();
+      retryRef.current = 0;
       const isFutures = market === "FUTURES";
       const streamName = sym.replace("_", "").toLowerCase() + "@ticker";
       const url = isFutures
         ? `wss://fstream.binance.com/ws/${streamName}`
         : `wss://stream.binance.com:9443/ws/${streamName}`;
+      const redo = () => connectBinance(sym);
       const ws = new WebSocket(url);
       wsRef.current = ws;
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data as string);
-        const last = parseFloat(data.c);
-        const pct = parseFloat(data.P);
-        update(last, pct);
+      const restFallback = async () => {
+        try {
+          const tvSym = sym.replace("_", "");
+          const rest = isFutures
+            ? `https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${tvSym}`
+            : `https://api.binance.com/api/v3/ticker/24hr?symbol=${tvSym}`;
+          const r = await mexcFetch(rest);
+          const d = (await r.json()) as { lastPrice?: string; priceChangePercent?: string };
+          const last = parseFloat(d.lastPrice ?? "");
+          const pct = parseFloat(d.priceChangePercent ?? "0");
+          update(last, pct);
+        } catch {
+          // ignore — el watchdog/reintento sigue corriendo
+        }
       };
+      const onSilent = () => {
+        if (!activeRef.current || wsRef.current !== ws) return;
+        void restFallback();
+        pokeWatchdog(onSilent);
+        scheduleReconnect(redo);
+      };
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data as string);
+          const last = parseFloat(data.c);
+          const pct = parseFloat(data.P);
+          update(last, pct);
+          retryRef.current = 0;
+          pokeWatchdog(onSilent);
+        } catch {
+          // ignore
+        }
+      };
+      ws.onerror = () => {
+        if (!activeRef.current) return;
+        void restFallback();
+        scheduleReconnect(redo);
+      };
+      ws.onclose = () => {
+        if (!activeRef.current || wsRef.current !== ws) return;
+        wsRef.current = null;
+        if (watchdogRef.current) window.clearTimeout(watchdogRef.current);
+        void restFallback();
+        scheduleReconnect(redo);
+      };
+      pokeWatchdog(onSilent);
     },
-    [market, stop, update],
+    [market, stop, update, scheduleReconnect, pokeWatchdog],
   );
 
   const connectMexcFuturesWs = useCallback(
     (sym: string) => {
       stop();
+      retryRef.current = 0;
+      const redo = () => connectMexcFuturesWs(sym);
+      const startPollFallback = () => {
+        if (!activeRef.current || pollRef.current != null) return;
+        void fetchMexcTicker(sym);
+        pollRef.current = window.setInterval(() => fetchMexcTicker(sym), 3000);
+      };
+      const onSilent = () => {
+        if (!activeRef.current) return;
+        startPollFallback();
+        pokeWatchdog(onSilent);
+        scheduleReconnect(redo);
+      };
       const ws = new WebSocket("wss://contract.mexc.com/edge");
       wsRef.current = ws;
       ws.onopen = () => {
         ws.send(JSON.stringify({ method: "sub.ticker", param: { symbol: sym } }));
-        pollRef.current = window.setInterval(() => {
+        retryRef.current = 0;
+        if (pingRef.current) window.clearInterval(pingRef.current);
+        pingRef.current = window.setInterval(() => {
           try {
             ws.send(JSON.stringify({ method: "ping" }));
           } catch {
             // ignore
           }
         }, 20000);
+        pokeWatchdog(onSilent);
       };
       ws.onmessage = (e) => {
         try {
@@ -108,21 +210,31 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
             const last = parseFloat(d.lastPrice);
             const pct = parseFloat(d.riseFallRate ?? "0") * 100;
             if (isFinite(last)) update(last, isFinite(pct) ? pct : 0);
+            retryRef.current = 0;
+            pokeWatchdog(onSilent);
           }
         } catch {
           // ignore
         }
       };
-      ws.onerror = () => {
-        stop();
-        fetchMexcTicker(sym);
-        pollRef.current = window.setInterval(() => fetchMexcTicker(sym), 3000);
+      const onDead = () => {
+        if (!activeRef.current) return;
+        if (pingRef.current) {
+          window.clearInterval(pingRef.current);
+          pingRef.current = null;
+        }
+        startPollFallback();
+        scheduleReconnect(redo);
       };
+      ws.onerror = onDead;
       ws.onclose = () => {
-        if (pollRef.current) window.clearInterval(pollRef.current);
+        if (!activeRef.current || wsRef.current !== ws) return;
+        wsRef.current = null;
+        onDead();
       };
+      pokeWatchdog(onSilent);
     },
-    [fetchMexcTicker, stop, update],
+    [fetchMexcTicker, stop, update, scheduleReconnect, pokeWatchdog],
   );
 
   const connectMexcPoll = useCallback(
@@ -136,13 +248,17 @@ export function useLivePrice(symbol: string, exchange: Exchange, market: Market)
 
   useEffect(() => {
     if (!symbol) return;
+    activeRef.current = true;
     if (exchange === "MEXC") {
       if (market === "FUTURES") connectMexcFuturesWs(symbol);
       else connectMexcPoll(symbol);
     } else {
       connectBinance(symbol);
     }
-    return stop;
+    return () => {
+      activeRef.current = false;
+      stop();
+    };
   }, [symbol, exchange, market, connectBinance, connectMexcFuturesWs, connectMexcPoll, stop]);
 
   return { price, changePct };

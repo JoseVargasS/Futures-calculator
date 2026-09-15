@@ -35,7 +35,7 @@ export const translations = {
       badgeUnfavorable: "DESFAVORABLE",
     },
     chart: {
-      title: "Gráfico Técnico Interactivo",
+      title: "GRÁFICO",
       sma: "SMA 50,75,100,150,200",
       rsiVol: "RSI & VOL",
     },
@@ -85,7 +85,7 @@ export const translations = {
       badgeUnfavorable: "UNFAVORABLE",
     },
     chart: {
-      title: "Interactive Technical Chart",
+      title: "CHART",
       sma: "SMA 50,75,100,150,200",
       rsiVol: "RSI & VOL",
     },
