@@ -105,7 +105,7 @@ export function Calculator({ livePrice }: Props) {
 
   return (
     <>
-      <section className="animate-rise space-y-4 rounded-xl border border-white/10 bg-surface p-4 shadow-xl" style={{ ["--rise-delay" as string]: "90ms" }}>
+      <section className="animate-rise space-y-3 rounded-xl border border-white/10 bg-surface p-3 shadow-xl sm:space-y-4 sm:p-4" style={{ ["--rise-delay" as string]: "90ms" }}>
         <div className="flex items-center justify-between border-b border-white/5 pb-3">
           <h2 className="text-xs font-extrabold uppercase tracking-wider text-white">{t.calculator.title}</h2>
           <div className="flex items-center gap-0.5 rounded-full bg-field p-1" role="group" aria-label="TP/SL mode">
@@ -115,21 +115,21 @@ export function Calculator({ livePrice }: Props) {
         </div>
 
         <div className="grid grid-cols-2 gap-1 rounded-full bg-field p-1" role="group" aria-label="Direction">
-          <button onClick={() => setDirection("LONG")} aria-pressed={direction === "LONG"} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "LONG" ? "bg-accentGreen text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.long} <span aria-hidden="true">↗</span></button>
-          <button onClick={() => setDirection("SHORT")} aria-pressed={direction === "SHORT"} className={`flex min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "SHORT" ? "bg-accentRed text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.short} <span aria-hidden="true">↘</span></button>
+          <button onClick={() => setDirection("LONG")} aria-pressed={direction === "LONG"} className={`flex min-h-10 sm:min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "LONG" ? "bg-accentGreen text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.long} <span aria-hidden="true">↗</span></button>
+          <button onClick={() => setDirection("SHORT")} aria-pressed={direction === "SHORT"} className={`flex min-h-10 sm:min-h-11 items-center justify-center gap-1.5 rounded-full py-2.5 text-sm font-extrabold transition-all duration-200 ease-out-expo active:scale-[0.98] ${direction === "SHORT" ? "bg-accentRed text-white" : "text-gray-400 hover:text-white"}`}>{t.calculator.short} <span aria-hidden="true">↘</span></button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <div>
             <label className="mb-1.5 block text-[11px] font-semibold text-gray-400">{t.calculator.margin}</label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-500" aria-hidden="true">$</span>
-              <input type="number" value={margin || ""} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
+              <input type="number" value={margin || ""} onChange={(e) => setMargin(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field py-2 pl-7 pr-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
             </div>
           </div>
           <div>
             <label className="mb-1.5 block text-[11px] font-semibold text-gray-400">{t.calculator.leverage}</label>
-            <select value={leverage} onChange={(e) => setLeverage(parseInt(e.target.value))} className="tnum min-h-11 w-full cursor-pointer rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25">
+            <select value={leverage} onChange={(e) => setLeverage(parseInt(e.target.value))} className="tnum min-h-10 sm:min-h-11 w-full cursor-pointer rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25">
               {LEVERAGES.map((v) => (
                 <option key={v} value={v}>{v}x</option>
               ))}
@@ -142,40 +142,40 @@ export function Calculator({ livePrice }: Props) {
             <label className="text-[11px] font-semibold text-gray-400">{t.calculator.entryPrice}</label>
             <span className="tnum font-mono text-[10px] text-gray-500">{tokens.toFixed(4)} {t.calculator.contracts}</span>
           </div>
-          <input type="number" value={entry} onChange={(e) => setEntry(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
+          <input type="number" value={entry} onChange={(e) => setEntry(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-white outline-none transition-shadow duration-200 focus:ring-2 focus:ring-white/25" />
         </div>
 
         {tpSlMode === "PRICE" ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold text-accentGreen">{t.calculator.takeProfit}</label>
-              <input type="number" value={tpPrice} onChange={(e) => setTpPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
+              <input type="number" value={tpPrice} onChange={(e) => setTpPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
             </div>
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold text-accentRed">{t.calculator.stopLoss}</label>
-              <input type="number" value={slPrice} onChange={(e) => setSlPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
+              <input type="number" value={slPrice} onChange={(e) => setSlPrice(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field px-3 py-2 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold text-accentGreen">{t.calculator.targetRoe}</label>
               <div className="relative">
-                <input type="number" value={tpPct} onChange={(e) => setTpPct(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
+                <input type="number" value={tpPct} onChange={(e) => setTpPct(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentGreen outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentGreen/40" />
                 <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-accentGreen" aria-hidden="true">%</span>
               </div>
             </div>
             <div>
               <label className="mb-1.5 block text-[11px] font-semibold text-accentRed">{t.calculator.limitRoe}</label>
               <div className="relative">
-                <input type="number" value={slPct} onChange={(e) => setSlPct(parseFloat(e.target.value) || 0)} className="tnum min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
+                <input type="number" value={slPct} onChange={(e) => setSlPct(parseFloat(e.target.value) || 0)} className="tnum min-h-10 sm:min-h-11 w-full rounded-lg bg-field py-2 pl-3 pr-7 text-sm font-bold text-accentRed outline-none transition-shadow duration-200 focus:ring-2 focus:ring-accentRed/40" />
                 <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-accentRed" aria-hidden="true">%</span>
               </div>
             </div>
           </div>
         )}
 
-        <div className="space-y-3 rounded-xl bg-black/40 p-3.5">
+        <div className="space-y-3 rounded-xl bg-black/40 p-3 sm:p-3.5">
           <div className="grid grid-cols-2 gap-2 border-b border-white/5 pb-2.5 text-xs">
             <div>
               <span className="block text-[10px] font-bold uppercase tracking-wider text-gray-500">{t.calculator.positionValue}</span>

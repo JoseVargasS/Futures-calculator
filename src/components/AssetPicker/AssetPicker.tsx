@@ -66,10 +66,10 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
   };
 
   return (
-    <div ref={wrapRef} className="relative">
-      <div className="relative">
+    <div ref={wrapRef} className="relative min-w-0 flex-1 md:flex-none">
+      <div className="flex min-h-10 items-center gap-1 rounded-lg bg-field py-1.5 pl-8 pr-2 outline-none transition-shadow duration-200 focus-within:ring-2 focus-within:ring-white/25">
         <svg
-          className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-500"
+          className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 shrink-0 -translate-y-1/2 text-gray-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -89,9 +89,9 @@ export function AssetPicker({ symbols, value, market, onSelect }: Props) {
           aria-expanded={open}
           aria-autocomplete="list"
           role="combobox"
-          className="tnum min-h-10 w-[155px] rounded-lg bg-field py-1.5 pl-8 pr-7 text-sm font-bold uppercase text-white outline-none transition-shadow duration-200 placeholder:font-medium placeholder:text-gray-500 focus:ring-2 focus:ring-white/25 sm:w-[200px]"
+          className="tnum min-w-0 flex-1 bg-transparent text-sm font-bold uppercase text-white outline-none placeholder:font-medium placeholder:normal-case placeholder:text-gray-500 md:w-[130px] md:flex-none"
         />
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-500">{symbols.length} {t.assetPicker.pairs}</span>
+        <span className="tnum shrink-0 text-[10px] font-bold text-gray-500">{symbols.length} {t.assetPicker.pairs}</span>
       </div>
 
       {open && (

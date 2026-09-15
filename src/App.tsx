@@ -68,9 +68,9 @@ export default function App() {
         onSymbolChange={handleSymbolChange}
       />
 
-      <main className="mx-auto w-full max-w-[1600px] px-2 pt-3 sm:px-3 lg:px-4">
-        <div className="grid grid-cols-1 items-stretch gap-2.5 lg:grid-cols-12 lg:gap-3">
-          <div className="space-y-2.5 lg:col-span-4 xl:col-span-3">
+      <main className="mx-auto w-full max-w-[1600px] px-2 pt-2 sm:px-3 sm:pt-3 lg:px-4">
+        <div className="grid grid-cols-1 items-stretch gap-2 sm:gap-2.5 lg:grid-cols-12 lg:gap-3">
+          <div className="space-y-2 sm:space-y-2.5 lg:col-span-4 xl:col-span-3">
             <TickerCard exchange={exchange} market={market} price={price} changePct={changePct} />
             <Calculator livePrice={price} />
           </div>
